@@ -208,6 +208,38 @@ typedef uint8_t byte_t;
 
 #define SEC             ((byte_t) 0x38)
 
+#define SED             ((byte_t) 0xF8)
+
+#define SEI             ((byte_t) 0x78)
+
+#define STA_ZP          ((byte_t) 0x85)
+#define STA_ZP_X        ((byte_t) 0x95)
+#define STA_AB          ((byte_t) 0x8D)
+#define STA_AB_X        ((byte_t) 0x9D)
+#define STA_AB_Y        ((byte_t) 0x99)
+#define STA_IR_X        ((byte_t) 0x81)
+#define STA_IR_Y        ((byte_t) 0x91)
+
+#define STX_ZP          ((byte_t) 0x84)
+#define STX_ZP_X        ((byte_t) 0x94)
+#define STX_AB          ((byte_t) 0x8E)
+
+#define STY_ZP          ((byte_t) 0x84)
+#define STY_ZP_X        ((byte_t) 0x94)
+#define STY_AB          ((byte_t) 0x8C)
+
+#define TAX             ((byte_t) 0xAA)
+
+#define TAY             ((byte_t) 0xA8)
+
+#define TSX             ((byte_t) 0xBA)
+
+#define TXA             ((byte_t) 0x8A)
+
+#define TXS             ((byte_t) 0x9A)
+
+#define TYA             ((byte_t) 0x98)
+
 struct NES
 {
     /*
