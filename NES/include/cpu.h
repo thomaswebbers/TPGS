@@ -1,5 +1,6 @@
 #ifndef CPU_H
 #define CPU_H
+#include <stdint.h>
 
 struct CPU
 {
@@ -19,16 +20,16 @@ struct CPU
      byte_t Y;
 
      /*
-      * Processor status
+      * Processor Status
       * =================
-      * 0 => Carry (if last instruction resulted in under/overflow)
-      * 1 => Zero (if last instruction's result was 0)
-      * 2 => Interrupt Disable (Enable to prevent system from responding to interrupts)
-      * 3 => Decimal mode (unsupported on this chip variant)
-      * 4 => Break Command (if BRK (break) instruction has been executed)
-      * 5 => Empty
-      * 6 => Overflow (if previous instruction resulted in an invalid two's complement)
-      * 7 => Negative
+      * 0       - Carry (if last instruction resulted in under/overflow)
+      * 1       - Zero (if last instruction's result was 0)
+      * 2       - Interrupt Disable (Enable to prevent system from responding to interrupts)
+      * 3       - Decimal mode (unsupported on this chip variant)
+      * 4       - Break Command (if BRK (break) instruction has been executed)
+      * 5       - Empty
+      * 6       - Overflow (if previous instruction resulted in an invalid two's complement)
+      * 7       - Negative
       */
      byte_t P;
 };

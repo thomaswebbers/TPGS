@@ -247,6 +247,8 @@ typedef uint8_t byte_t;
 
 #define NES_MEMORY_SIZE ((uint32_t) 0x10000)
 
+#define INIT_SUCCES     ((uint32_t) 0x00);
+
 struct NES
 {
     /*
@@ -267,8 +269,6 @@ struct NES
     byte_t memory[NES_MEMORY_SIZE];
 
     struct CPU cpu;
-
-
 }
 
 /*
