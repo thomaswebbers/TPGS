@@ -11,32 +11,78 @@ typedef uint8_t byte_t;
  *
  * ADDRESSING MODES:
  * =================
- * IMM      => Immediate
- * ZP       => Zero-Page
- * ABS      => Absolute
- * IMP      => Implied
- * ACC      => Accumulator
- * IXX      => Indexed (index register X)
- * IXY      => Indexed (index register Y)
- * ZPIXX    => Zero-Page Indexed (index register X)
- * ZPIXY    => Zero-Page Indexed (index register Y)
- * IDR      => Indirect
- * PREII    => Pre-Indexed Indirect
- * POSII    => Post-Indexed Indirect
- * REL      => Relative
+ * IMM      - Immediate
+ * ZP       - Zero-Page
+ * ABS      - Absolute
+ * IMP      - Implied
+ * ACC      - Accumulator
+ * IXX      - Indexed (index register X)
+ * IXY      - Indexed (index register Y)
+ * ZPIXX    - Zero-Page Indexed (index register X)
+ * ZPIXY    - Zero-Page Indexed (index register Y)
+ * IDR      - Indirect
+ * PREII    - Pre-Indexed Indirect
+ * POSII    - Post-Indexed Indirect
+ * REL      - Relative
  *
  * OPCODES:
  * ========
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
+ * ADC      - Add M to A with Carry
+ * AND      - "AND" M with A
+ * ASL      - Shift Left One Bit (M or A)
+ * BCC      - Branch on Carry Clear
+ * BCS      - Branch on Carry Set
+ * BEQ      - Branch on Result Zero
+ * BIT      - Test Bits in M with A
+ * BMI      - Branch on Result Minus
+ * BNE      - Branch on Result not Zero
+ * BPL      - Branch on Result Plus
+ * BRK      - Force Break
+ * BVC      - Branch on Overflow Clear
+ * BVS      - Branch on Overflow Set
+ * CLC      - Clear Carry Flag
+ * CLD      - Clear Decimal Mode
+ * CLI      - Clear interrupt Disable Bit
+ * CLV      - Clear Overflow Flag
+ * CMP      - Compare M and A
+ * CPX      - Compare M and X
+ * CPY      - Compare M and Y
+ * DEC      - Decrement M by One
+ * DEX      - Decrement X by One
+ * DEY      - Decrement Y by One
+ * EOR      - "Exclusive     -Or" M with A
+ * INC      - Increment M by One
+ * INX      - Increment X by One
+ * INY      - Increment Y by One
+ * JMP      - Jump to Location
+ * JSR      - Jump to Location Save Return Address
+ * LDA      - Load A with M
+ * LDX      - Load X with M
+ * LDY      - Load Y with M
+ * LSR      - Shift Right One Bit (M or A)
+ * NOP      - No Operation
+ * ORA      - "OR" M with A
+ * PHA      - Push A on Stack
+ * PHP      - Push Processor Status on Stack
+ * PLA      - Pull A from Stack
+ * PLP      - Pull Processor Status from Stack
+ * ROL      - Rotate One Bit Left (M or A)
+ * ROR      - Rotate One Bit Right (M or A)
+ * RTI      - Return from Interrupt
+ * RTS      - Return from Subroutine
+ * SBC      - Subtract M from A with Borrow
+ * SEC      - Set Carry Flag
+ * SED      - Set Decimal Mode
+ * SEI      - Set Interrupt Disable Status
+ * STA      - Store A in M
+ * STX      - Store X in M
+ * STY      - Store Y in M
+ * TAX      - Transfer A to X
+ * TAY      - Transfer A to Y
+ * TSX      - Transfer Stack Pointer to X
+ * TXA      - Transfer X to A
+ * TXS      - Transfer X to Stack Pointer
+ * TYA      - Transfer Y to A
  */
 
 #define IMM_ADC         ((byte_t) 0x69)
@@ -206,17 +252,17 @@ struct NES
     /*
      * MEMORY LAYOUT:
      * ==============
-     * 0x100   => Zero Page
-     * 0x200   => Stack
-     * 0x800   => RAM
-     * 0x2000  => Mirrors (0-0x7FF)
-     * 0x2008  => I/O Registers
-     * 0x4000  => Mirrors (0x2000-0x2007)
-     * 0x4020  => I/O Registers
-     * 0x6000  => Expansion ROM
-     * 0x8000  => SRAM
-     * 0xC000  => PRG-ROM (Lower Bank)
-     * 0x10000 => PRG-ROM (Upper Bank)
+     * 0x100   - Zero Page
+     * 0x200   - Stack
+     * 0x800   - RAM
+     * 0x2000  - Mirrors (0-0x7FF)
+     * 0x2008  - I/O Registers
+     * 0x4000  - Mirrors (0x2000-0x2007)
+     * 0x4020  - I/O Registers
+     * 0x6000  - Expansion ROM
+     * 0x8000  - SRAM
+     * 0xC000  - PRG-ROM (Lower Bank)
+     * 0x10000 - PRG-ROM (Upper Bank)
      */
     byte_t memory[NES_MEMORY_SIZE];
 
