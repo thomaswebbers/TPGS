@@ -1,15 +1,24 @@
 #include "nes.h"
+#include "stdio.h"
 
-int main()
+struct NES *nes_handle;
+
+int main(int argc, char **argv)
 {
-    if((int error_flag = init_nes()) != INIT_SUCCES)
+    if (argc < 2)
+    {
+      fprintf(stderr, "Usage: ./tnes rom\n");
+      return 1;
+    }
+
+    if((int exit_flag = init_nes(&nes_handle, argv[1])) != INIT_SUCCES)
     {
         fprintf(stderr, "Error initializing TNES\n
-                         Error flag: %d", error_flag);
+                         Error flag: %d\n", exit_flag);
         return -1;
     }
 
-    run_nes();
+    run_nes(nes_handle);
 
-    destroy_nes();
+    destroy_nes(nes_handle);
 }
