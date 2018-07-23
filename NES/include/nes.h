@@ -247,7 +247,19 @@ typedef uint8_t byte_t;
 
 #define NES_MEMORY_SIZE ((uint32_t) 0x10000)
 
-#define INIT_SUCCES     ((uint32_t) 0x00);
+#define INIT_SUCCES     ((uint32_t) 0x00)
+
+#define NES_MAGIC       "NES\n"
+
+#define SET_NEGATIVE_FLAG(nes_handle, operand)
+    (operand > 0x7F
+        ? nes_handle->cpu.P = nes_handle->cpu.P | 0x80
+        : nes_handle->cpu.P = nes_handle->cpu.P & 0x7F)
+
+#define SET_ZERO_FLAG(nes_handle, operand)
+    (operand == 0
+        ? nes_handle->cpu.P = nes_handle->cpu.P | 0x02
+        : nes_handle->cpu.P = nes_handle->cpu.P & 0xFD)
 
 struct NES
 {

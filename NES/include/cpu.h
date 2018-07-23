@@ -22,14 +22,14 @@ struct CPU
      /*
       * Processor Status
       * =================
-      * 0       - Carry (if last instruction resulted in under/overflow)
-      * 1       - Zero (if last instruction's result was 0)
-      * 2       - Interrupt Disable (Enable to prevent system from responding to interrupts)
-      * 3       - Decimal mode (unsupported on this chip variant)
-      * 4       - Break Command (if BRK (break) instruction has been executed)
-      * 5       - Empty
-      * 6       - Overflow (if previous instruction resulted in an invalid two's complement)
-      * 7       - Negative
+      * 0x01    - Carry (if last instruction resulted in under/overflow)
+      * 0x02    - Zero (if last instruction's result was 0)
+      * 0x04    - Interrupt Disable (Enable to prevent system from responding to interrupts)
+      * 0x08    - Decimal mode (unsupported on this chip variant)
+      * 0x10    - Break Command (if BRK (break) instruction has been executed)
+      * 0x20    - Empty
+      * 0x40    - Overflow (if previous instruction resulted in an invalid two's complement)
+      * 0x80    - Negative
       */
      byte_t P;
 };
