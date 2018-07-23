@@ -129,6 +129,7 @@ typedef uint8_t byte_t;
 #define ABS_DEC         ((byte_t) 0xCE)
 #define ABS_EOR         ((byte_t) 0x4D)
 #define ABS_INC         ((byte_t) 0xEE)
+#define ABS_JSR         ((byte_t) 0x20)
 #define ABS_LDA         ((byte_t) 0xAD)
 #define ABS_LDX         ((byte_t) 0xAE)
 #define ABS_LDY         ((byte_t) 0xAC)
@@ -244,8 +245,25 @@ typedef uint8_t byte_t;
 #define REL_BVC         ((byte_t) 0x50)
 #define REL_BVS         ((byte_t) 0x70)
 
+/*
+ * The operations on the NES have different amounts of cycles depending on the
+ * operation and sometimes branches taken within one operation. To emulate the
+ * NES correctly, the amount of cycles used by each operation should be taken
+ * into account.
+ */
 
-#define NES_MEMORY_SIZE ((uint32_t) 0x10000)
+#define C_ONE           ((uint32_t) 1)
+#define C_TWO           ((uint32_t) 2)
+#define C_THREE         ((uint32_t) 3)
+#define C_FOUR          ((uint32_t) 4)
+#define C_FIVE          ((uint32_t) 5)
+#define C_SIX           ((uint32_t) 6)
+#define C_SEVEN         ((uint32_t) 7)
+
+//A cycle to be added if Indexing Accros Page Boundary
+#define C_IAPB          ((uint32_t) 1)
+//A cycle to be added if a Branch is Taken
+#define C_BT            ((uint32_t) 1)
 
 #define INIT_SUCCES     ((uint32_t) 0x00)
 
@@ -263,24 +281,11 @@ typedef uint8_t byte_t;
 
 struct NES
 {
-    /*
-     * MEMORY LAYOUT:
-     * ==============
-     * 0x100   - Zero Page
-     * 0x200   - Stack
-     * 0x800   - RAM
-     * 0x2000  - Mirrors (0-0x7FF)
-     * 0x2008  - I/O Registers
-     * 0x4000  - Mirrors (0x2000-0x2007)
-     * 0x4020  - I/O Registers
-     * 0x6000  - Expansion ROM
-     * 0x8000  - SRAM
-     * 0xC000  - PRG-ROM (Lower Bank)
-     * 0x10000 - PRG-ROM (Upper Bank)
-     */
-    byte_t memory[NES_MEMORY_SIZE];
+    uint32_t master_clock;
 
     struct CPU cpu;
+
+    struct PPU ppu;
 }
 
 /*

@@ -21,6 +21,8 @@ void absolute_eor();
 
 void absolute_inc();
 
+void absolute_jsr();
+
 void absolute_lda();
 
 void absolute_ldx();
