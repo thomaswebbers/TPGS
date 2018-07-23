@@ -1,0 +1,2 @@
+These rom tests aren't owned by us. We Just use them for testing purposes.
+They can be downloaded from: http://wiki.nesdev.com/w/index.php/Emulator_tests

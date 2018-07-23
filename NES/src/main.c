@@ -11,10 +11,11 @@ int main(int argc, char **argv)
       return 1;
     }
 
-    if((int exit_flag = init_nes(&nes_handle, argv[1])) != INIT_SUCCES)
+    int exit_flag;
+    if((exit_flag = init_nes(&nes_handle, argv[1])) != INIT_SUCCES)
     {
-        fprintf(stderr, "Error initializing TNES\n
-                         Error flag: %d\n", exit_flag);
+        fprintf(stderr, "Error initializing TNES\n"
+                        "Error flag: %d\n", exit_flag);
         return -1;
     }
 

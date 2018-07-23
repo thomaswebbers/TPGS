@@ -1,23 +1,33 @@
+#include <stdio.h>
+#include <stdint.h>
+#include "nes.h"
+#include "opcodes.h"
 #include "cpu.h"
 
-void cpu_add_cycles(struct NES *nes_handle, uint32_t cycles)
+void init_cpu(struct CPU *cpu_handle)
 {
-    nes_handle->cpu.clock += cycles;
+    cpu_handle->clock = 0;
+    cpu_handle->pc = 0;
+    cpu_handle->sp = 0;
+    cpu_handle->A = 0;
+    cpu_handle->X = 0;
+    cpu_handle->Y = 0;
+    cpu_handle->P = 0;
 }
 
-byte_t cpu_current_byte(struct NES *nes_handle)
+void cpu_add_cycles(struct CPU *cpu_handle, uint32_t cycles)
 {
-    return nes_handle->cpu.memory[nes_handle->cpu.pc];
+    cpu_handle->clock += cycles;
 }
 
-bool cpu_step(struct NES *nes_handle)
+byte_t cpu_current_byte(struct CPU *cpu_handle)
 {
-    if(nes_handle->master_clock < nes_handle->cpu.clock)
-    {
-        return true;
-    }
+    return cpu_handle->memory[cpu_handle->pc];
+}
 
-    switch(cpu_current_byte(nes_handle))
+bool cpu_step(struct CPU *cpu_handle)
+{
+    switch(cpu_current_byte(cpu_handle))
     {
         /***********************************************
         **************Immediate Addressing**************
@@ -364,7 +374,8 @@ bool cpu_step(struct NES *nes_handle)
             break;
 
         default:
-            break;
+            fprintf(stderr, "DEFAULT: %x\n", cpu_current_byte(cpu_handle));
+            return false;
     }
     return true;
 }

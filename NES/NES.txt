@@ -1,1 +1,5 @@
-This is an emulator for NES
+This is an emulator for NES.
+
+Some usefull resources:
+http://www.nesdev.com/NESDoc.pdf
+http://wiki.nesdev.com/w/index.php/Emulator_tests
