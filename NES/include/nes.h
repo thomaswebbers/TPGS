@@ -5,12 +5,13 @@
 
 #include "cpu.h"
 #include "ppu.h"
+#include "cartrige.h"
 
 
 
 #define INIT_SUCCES         ((uint32_t) 0x00)
 #define INIT_FAILURE        ((uint32_t) 0xFF)
-#define NES_SIGNATURE       "NES\x1A"
+
 /*
 #define SET_NEGATIVE_FLAG(nes_handle, operand)
     ((operand) > 0x7F
@@ -29,6 +30,8 @@ struct NES
     struct CPU cpu;
 
     struct PPU ppu;
+
+    struct Cartrige cartrige;
 };
 
 /*

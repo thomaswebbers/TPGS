@@ -5,7 +5,7 @@
 #include "nes.h"
 #include "cpu.h"
 #include "ppu.h"
-#include "rom.h"
+#include "cartrige.h"
 
 int init_nes(struct NES **nes_handle, char *binary_file)
 {
@@ -14,7 +14,7 @@ int init_nes(struct NES **nes_handle, char *binary_file)
     init_cpu(&((**nes_handle).cpu));
     init_ppu(&((**nes_handle).ppu));
 
-    if(!load_rom(*nes_handle, binary_file))
+    if(!load_cartrige(&(**nes_handle).cartrige, binary_file))
     {
         free(*nes_handle);
         return INIT_FAILURE;
