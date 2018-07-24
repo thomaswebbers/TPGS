@@ -3,6 +3,7 @@
 #include "nes.h"
 #include "opcodes.h"
 #include "cpu.h"
+#include "cpumem.h"
 
 void init_cpu(struct CPU *cpu_handle)
 {
@@ -15,19 +16,19 @@ void init_cpu(struct CPU *cpu_handle)
     cpu_handle->P = 0;
 }
 
+void destroy_cpu(struct CPU *cpu_handle)
+{
+
+}
+
 void cpu_add_cycles(struct CPU *cpu_handle, uint32_t cycles)
 {
     cpu_handle->clock += cycles;
 }
 
-byte_t cpu_current_byte(struct CPU *cpu_handle)
-{
-    return cpu_handle->memory[cpu_handle->pc];
-}
-
 bool cpu_step(struct CPU *cpu_handle)
 {
-    switch(cpu_current_byte(cpu_handle))
+    switch(cpumem_read(&cpu_handle->memory, cpu_handle->pc))
     {
         /***********************************************
         **************Immediate Addressing**************
@@ -374,7 +375,7 @@ bool cpu_step(struct CPU *cpu_handle)
             break;
 
         default:
-            fprintf(stderr, "DEFAULT: %x\n", cpu_current_byte(cpu_handle));
+            fprintf(stderr, "DEFAULT: %x\n", cpumem_read(&cpu_handle->memory, cpu_handle->pc));
             return false;
     }
     return true;

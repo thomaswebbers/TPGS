@@ -3,8 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "opcodes.h"
-
-#define NES_MEMORY_SIZE ((uint32_t) 0x10000)
+#include "cpumem.h"
 
 struct CPU
 {
@@ -58,7 +57,7 @@ struct CPU
      * 0xC000  - PRG-ROM (Lower Bank)
      * 0x10000 - PRG-ROM (Upper Bank)
      */
-    byte_t memory[NES_MEMORY_SIZE];
+    struct CPUmem memory;
 };
 
 /*
@@ -91,12 +90,12 @@ void cpu_add_cycles(struct CPU *cpu_handle, uint32_t cycles);
 bool cpu_step(struct CPU *cpu_handle);
 
 /*
- * Fetches the byte the pc is currenty pointing to.
+ * Cleans up the resources used by the cpu.
  *
  * @param cpu_handle a handle to the nes virtual machine cpu
  *
- * @return byte pc is pointing to
+ * @return void
  */
-byte_t cpu_current_byte(struct CPU *cpu_handle);
+void destroy_cpu(struct CPU *cpu_handle);
 
 #endif

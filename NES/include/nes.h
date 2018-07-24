@@ -5,7 +5,7 @@
 
 #include "cpu.h"
 #include "ppu.h"
-#include "cartrige.h"
+#include "mmc.h"
 
 
 
@@ -31,7 +31,7 @@ struct NES
 
     struct PPU ppu;
 
-    struct Cartrige cartrige;
+    struct MMC mmc;
 };
 
 /*
