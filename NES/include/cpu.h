@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "opcodes.h"
 #include "cpumem.h"
+#include "cpupsr.h"
 
 struct CPU
 {
@@ -40,7 +41,7 @@ struct CPU
      * 0x40    - Overflow (if previous instruction resulted in an invalid two's complement)
      * 0x80    - Negative
      */
-    byte_t P;
+    struct PSR P;
 
     /*
      * MEMORY LAYOUT:
@@ -97,5 +98,145 @@ bool cpu_step(struct CPU *cpu_handle);
  * @return void
  */
 void destroy_cpu(struct CPU *cpu_handle);
+
+/*
+ * Pushes the top byte on the stack in the CPUmemory.
+ *
+ * @param cpu_handle a handle to the nes virtual machine cpu
+ * @param data the byte to be pushed on the stack
+ *
+ * @return void
+ */
+void cpu_push(struct CPU *cpu_handle, byte_t data);
+
+/*
+ * Pops the top item of the stack in the CPUmemory.
+ *
+ * @param cpu_handle a handle to the nes virtual machine cpu
+ *
+ * @return top byte of the stack
+ */
+byte_t cpu_pop(struct CPU *cpu_handle);
+
+/*
+ * Peeks at the top item on the stack in the CPUmemory.
+ *
+ * @param cpu_handle a handle to the nes virtual machine cpu
+ *
+ * @return top byte of the stack
+ */
+byte_t cpu_peek(struct CPU *cpu_handle);
+
+void cpu_adc(struct CPU *cpu_handle, byte_t operand);
+
+void cpu_and(struct CPU *cpu_handle, byte_t operand);
+
+void cpu_asl(struct CPU *cpu_handle);
+
+void cpu_bcc(struct CPU *cpu_handle);
+
+void cpu_bcs(struct CPU *cpu_handle);
+
+void cpu_beq(struct CPU *cpu_handle);
+
+void cpu_bit(struct CPU *cpu_handle);
+
+void cpu_bmi(struct CPU *cpu_handle);
+
+void cpu_bne(struct CPU *cpu_handle);
+
+void cpu_bpl(struct CPU *cpu_handle);
+
+void cpu_brk(struct CPU *cpu_handle);
+
+void cpu_bvc(struct CPU *cpu_handle);
+
+void cpu_bvs(struct CPU *cpu_handle);
+
+void cpu_clc(struct CPU *cpu_handle);
+
+void cpu_cld(struct CPU *cpu_handle);
+
+void cpu_cli(struct CPU *cpu_handle);
+
+void cpu_clv(struct CPU *cpu_handle);
+
+void cpu_cmp(struct CPU *cpu_handle);
+
+void cpu_cpx(struct CPU *cpu_handle);
+
+void cpu_cpy(struct CPU *cpu_handle);
+
+void cpu_dec(struct CPU *cpu_handle);
+
+void cpu_dex(struct CPU *cpu_handle);
+
+void cpu_dey(struct CPU *cpu_handle);
+
+void cpu_eor(struct CPU *cpu_handle);
+
+void cpu_inc(struct CPU *cpu_handle);
+
+void cpu_inx(struct CPU *cpu_handle);
+
+void cpu_iny(struct CPU *cpu_handle);
+
+void cpu_jmp(struct CPU *cpu_handle);
+
+void cpu_jsr(struct CPU *cpu_handle);
+
+void cpu_lda(struct CPU *cpu_handle);
+
+void cpu_ldx(struct CPU *cpu_handle);
+
+void cpu_ldy(struct CPU *cpu_handle);
+
+void cpu_lsr(struct CPU *cpu_handle);
+
+void cpu_nop(struct CPU *cpu_handle);
+
+void cpu_ora(struct CPU *cpu_handle);
+
+void cpu_pha(struct CPU *cpu_handle);
+
+void cpu_php(struct CPU *cpu_handle);
+
+void cpu_pla(struct CPU *cpu_handle);
+
+void cpu_plp(struct CPU *cpu_handle);
+
+void cpu_rol(struct CPU *cpu_handle);
+
+void cpu_ror(struct CPU *cpu_handle);
+
+void cpu_rti(struct CPU *cpu_handle);
+
+void cpu_rts(struct CPU *cpu_handle);
+
+void cpu_sbc(struct CPU *cpu_handle);
+
+void cpu_sec(struct CPU *cpu_handle);
+
+void cpu_sed(struct CPU *cpu_handle);
+
+void cpu_sei(struct CPU *cpu_handle);
+
+void cpu_sta(struct CPU *cpu_handle);
+
+void cpu_stx(struct CPU *cpu_handle);
+
+void cpu_sty(struct CPU *cpu_handle);
+
+void cpu_tax(struct CPU *cpu_handle);
+
+void cpu_tay(struct CPU *cpu_handle);
+
+void cpu_tsx(struct CPU *cpu_handle);
+
+void cpu_txa(struct CPU *cpu_handle);
+
+void cpu_txs(struct CPU *cpu_handle);
+
+void cpu_tya(struct CPU *cpu_handle);
 
 #endif

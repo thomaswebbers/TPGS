@@ -4,6 +4,7 @@
 #include "opcodes.h"
 #include "cpu.h"
 #include "cpumem.h"
+#include "cpupsr.h"
 
 void init_cpu(struct CPU *cpu_handle)
 {
@@ -14,7 +15,7 @@ void init_cpu(struct CPU *cpu_handle)
     cpu_handle->A = 0;
     cpu_handle->X = 0;
     cpu_handle->Y = 0;
-    cpu_handle->P = 0;
+    init_psr(&cpu_handle->P);
 }
 
 void destroy_cpu(struct CPU *cpu_handle)
@@ -29,7 +30,7 @@ void cpu_add_cycles(struct CPU *cpu_handle, uint32_t cycles)
 
 bool cpu_step(struct CPU *cpu_handle)
 {
-    //printf("opcode[%x]: %x\n", cpu_handle->pc, cpumem_read(&cpu_handle->memory, cpu_handle->pc));
+    printf("opcode[%x]: %x\n", cpu_handle->pc, cpumem_readb(&cpu_handle->memory, cpu_handle->pc));
     switch(cpumem_readb(&cpu_handle->memory, cpu_handle->pc))
     {
         /***********************************************
@@ -383,4 +384,38 @@ bool cpu_step(struct CPU *cpu_handle)
             return false;
     }
     return true;
+}
+
+void cpu_push(struct CPU *cpu_handle, byte_t data)
+{
+    //TODO
+}
+
+byte_t cpu_pop(struct CPU *cpu_handle)
+{
+    //TODO
+    return -1;
+}
+
+byte_t cpu_peek(struct CPU *cpu_handle)
+{
+    //TODO
+    return -1;
+}
+
+void cpu_adc(struct CPU *cpu_handle, byte_t operand)
+{
+    cpu_handle->memory.A += operand;
+    //TODO add  N Z C V PSR flag support
+}
+
+void cpu_and(struct CPU *cpu_handle, byte_t operand)
+{
+    cpu_handle->A &= operand;
+    //TODO add  N Z C PSR flag support (left most bit goes into carry)
+}
+
+void cpu_asl(struct CPU *cpu_handle)
+{
+    
 }
