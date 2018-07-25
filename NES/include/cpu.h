@@ -9,7 +9,7 @@
 struct CPU
 {
     /*
-     * Every processing unit in the nes gets its own clock to match against The
+     * Every processing unit in the nes gets its own clock to match against the
      * master clock. (i.e. to maintain same clock speed as original NES)
      */
     uint32_t clock;

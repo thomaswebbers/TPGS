@@ -31,6 +31,7 @@ void cpu_add_cycles(struct CPU *cpu_handle, uint32_t cycles)
 bool cpu_step(struct CPU *cpu_handle)
 {
     printf("opcode[%x]: %x\n", cpu_handle->pc, cpumem_readb(&cpu_handle->memory, cpu_handle->pc));
+    int cycles;
     switch(cpumem_readb(&cpu_handle->memory, cpu_handle->pc))
     {
         /***********************************************
@@ -383,6 +384,7 @@ bool cpu_step(struct CPU *cpu_handle)
             fprintf(stderr, "DEFAULT: %x\n", cpumem_readb(&cpu_handle->memory, cpu_handle->pc));
             return false;
     }
+    cpu_handle->clock += cycles;
     return true;
 }
 
@@ -405,7 +407,7 @@ byte_t cpu_peek(struct CPU *cpu_handle)
 
 void cpu_adc(struct CPU *cpu_handle, byte_t operand)
 {
-    cpu_handle->memory.A += operand;
+    cpu_handle->A += operand;
     //TODO add  N Z C V PSR flag support
 }
 
@@ -417,5 +419,5 @@ void cpu_and(struct CPU *cpu_handle, byte_t operand)
 
 void cpu_asl(struct CPU *cpu_handle)
 {
-    
+
 }
