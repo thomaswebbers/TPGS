@@ -57,49 +57,47 @@ bool init_rom(struct ROM *rom_handle, char *binary_file)
         return false;
     }
 
-    //amount of prg banks
+    //info on ines format found above
     rom_handle->num_prg = header[0x04];
-    printf("num_prg:\t%x\n", rom_handle->num_prg);
-
-    //amount of chr banks
     rom_handle->num_chr = header[0x05];
-    printf("num_chr:\t%x\n", rom_handle->num_chr);
-
-    //type of mirror (0x01 for vertical/horizontal, 0x02 for fourscreen)
     rom_handle->mirror = ((header[0x06] & 0x08) >> 0x02) | (header[0x06] & 0x01);
-    printf("mirror:\t\t%x\n", rom_handle->mirror);
-
-    //cartrige contains battery backed ram
     rom_handle->battery = (header[0x06] & 0x02) >> 0x01;
-    printf("battery:\t%x\n", rom_handle->battery);
-
-    //cartrige contains trainer UNUSED
-    byte_t trainer = (header[0x06] & 0x04) >> 0x02;
-    printf("trainer:\t%x\n", trainer);
-
-    //mapper type
+    byte_t trainer = (header[0x06] & 0x04) >> 0x02;     //UNUSED
     rom_handle->mapper = (header[0x07] & 0xF0) | ((header[0x06] & 0xF0) >> 0x04);
-    printf("mapper:\t\t%x\n", rom_handle->mapper);
-
-    //amount of ram banks
     byte_t numRAM = header[0x08];
     if(numRAM == 0)
         numRAM = 1;
+
+    //move past trainer data
+    if(trainer == 1)
+        fseek(fp, 0x200, SEEK_CUR);
+
+    //allocate and read all banks for prg rom
+    rom_handle->prg = malloc(sizeof(byte_t *) * rom_handle->num_prg);
+    for(int i = 0; i < rom_handle->num_prg; i++)
+    {
+        rom_handle->prg[i] = malloc(sizeof(byte_t) * PRG_ROM_BANK_SIZE);
+        fread(rom_handle->prg[i], sizeof(byte_t), PRG_ROM_BANK_SIZE, fp);
+        for(int j = 0x3FFF; j > 0x3FF0; j--)
+            printf("data[%x]: %x\n", j, rom_handle->prg[i][j]);
+    }
+
+    //allocate and read all banks for chr rom
+    rom_handle->chr = malloc(sizeof(byte_t *) * rom_handle->num_chr);
+    for(int i = 0; i < rom_handle->num_chr; i++)
+    {
+        rom_handle->chr[i] = malloc(sizeof(byte_t) * CHR_ROM_BANK_SIZE);
+        fread(rom_handle->chr[i], sizeof(byte_t), CHR_ROM_BANK_SIZE, fp);
+    }
+
+    printf("num_prg:\t%x\n", rom_handle->num_prg);
+    printf("num_chr:\t%x\n", rom_handle->num_chr);
+    printf("mirror:\t\t%x\n", rom_handle->mirror);
+    printf("battery:\t%x\n", rom_handle->battery);
+    printf("trainer:\t%x\n", trainer);
+    printf("mapper:\t\t%x\n", rom_handle->mapper);
     printf("numRAM:\t\t%x\tTODO :)\n", numRAM);
 
-    //allocate all banks for prg rom
-    rom_handle->prg = malloc(sizeof(*byte_t) * rom_handle->num_prg);
-    for(int i = 0; i < rom_handle->num_prg; i++)
-        rom_handle->prg[i] = malloc(sizeof(byte_t) * PRG_ROM_BANK_SIZE);
-
-    //TODO: read prg rom
-
-    //allocate all banks for chr rom
-    rom_handle->chr = malloc(sizeof(*byte_t) * rom_handle->num_chr);
-    for(int i = 0; i < rom_handle->num_chr; i++)
-        rom_handle->chr[i] = malloc(sizeof(byte_t) * CHR_ROM_BANK_SIZE);
-
-    //TODO: read chr rom
 
     fclose(fp);
     return true;
@@ -107,5 +105,13 @@ bool init_rom(struct ROM *rom_handle, char *binary_file)
 
 void destroy_rom(struct ROM *rom_handle)
 {
+    for(int i = 0; i < rom_handle->num_prg; i++)
+        free(rom_handle->prg[i]);
 
+    free(rom_handle->prg);
+
+    for(int i = 0; i < rom_handle->num_chr; i++)
+        free(rom_handle->chr[i]);
+
+    free(rom_handle->chr);
 }

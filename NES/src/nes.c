@@ -11,9 +11,9 @@ int init_nes(struct NES **nes_handle, char *binary_file)
 {
     *nes_handle = malloc(sizeof(struct NES));
     (**nes_handle).master_clock = 0;
+    init_mmc(&(**nes_handle).mmc, &(**nes_handle).cpu, &(**nes_handle).ppu, binary_file);
     init_cpu(&(**nes_handle).cpu);
     init_ppu(&(**nes_handle).ppu);
-    init_mmc(&(**nes_handle).mmc, &(**nes_handle).cpu, &(**nes_handle).ppu, binary_file);
     /*
     if(!load_cartrige(&(**nes_handle).rom, binary_file))
     {
@@ -28,15 +28,14 @@ void run_nes(struct NES *nes_handle)
 {
     while(step_nes(nes_handle))
     {
-        break;
+
     }
 }
 
 bool step_nes(struct NES *nes_handle)
 {
-    cpu_step(&(nes_handle->cpu));
     nes_handle->master_clock++;
-    return true;
+    return cpu_step(&(nes_handle->cpu));
 }
 
 void destroy_nes(struct NES *nes_handle)

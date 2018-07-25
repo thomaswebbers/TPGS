@@ -2,6 +2,10 @@
 #define CPUMEM_H
 #include "opcodes.h"
 
+#define NMI_VEC         ((uint16_t) 0xFFFA)
+#define RESET_VEC       ((uint16_t) 0xFFFC)
+#define IRQ_VEC         ((uint16_t) 0xFFFE)
+
 struct CPUmem
 {
     /*
@@ -35,17 +39,17 @@ struct CPUmem
 };
 
 /*
- * Reads from the cpu memory.
+ * Reads a byte from the cpu memory.
  *
  * @param cpu_handle a handle to the nes virtual machine cpu memory
  * @param address the address to read from
  *
  * @return the byte at the specified address
  */
-byte_t cpumem_read(struct CPUmem *cpumem_handle, uint16_t address);
+byte_t cpumem_readb(struct CPUmem *cpumem_handle, uint16_t address);
 
 /*
- * Writes to the cpu memory.
+ * Writes a byte to the cpu memory.
  *
  * @param cpumem_handle a handle to the nes virtual machine cpu memory
  * @param address the address to write to
@@ -53,6 +57,27 @@ byte_t cpumem_read(struct CPUmem *cpumem_handle, uint16_t address);
  *
  * @return void
  */
-void cpumem_write(struct CPUmem *cpumem_handle, uint16_t address, byte_t data);
+void cpumem_writeb(struct CPUmem *cpumem_handle, uint16_t address, byte_t data);
+
+/*
+ * Reads a byte from the cpu memory.
+ *
+ * @param cpu_handle a handle to the nes virtual machine cpu memory
+ * @param address the address to read from
+ *
+ * @return the short at the specified address
+ */
+uint16_t cpumem_reads(struct CPUmem *cpumem_handle, uint16_t address);
+
+/*
+ * Writes a short to the cpu memory.
+ *
+ * @param cpumem_handle a handle to the nes virtual machine cpu memory
+ * @param address the address to write to
+ * @param data the data which should be written at the specified address
+ *
+ * @return void
+ */
+void cpumem_writes(struct CPUmem *cpumem_handle, uint16_t address, uint16_t data);
 
 #endif

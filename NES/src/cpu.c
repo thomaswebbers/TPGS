@@ -8,7 +8,8 @@
 void init_cpu(struct CPU *cpu_handle)
 {
     cpu_handle->clock = 0;
-    cpu_handle->pc = 0;
+    cpu_handle->pc = cpumem_reads(&cpu_handle->memory, RESET_VEC);
+    printf("pc %x\n", cpu_handle->pc);
     cpu_handle->sp = 0;
     cpu_handle->A = 0;
     cpu_handle->X = 0;
@@ -28,7 +29,8 @@ void cpu_add_cycles(struct CPU *cpu_handle, uint32_t cycles)
 
 bool cpu_step(struct CPU *cpu_handle)
 {
-    switch(cpumem_read(&cpu_handle->memory, cpu_handle->pc))
+    //printf("opcode[%x]: %x\n", cpu_handle->pc, cpumem_read(&cpu_handle->memory, cpu_handle->pc));
+    switch(cpumem_readb(&cpu_handle->memory, cpu_handle->pc))
     {
         /***********************************************
         **************Immediate Addressing**************
@@ -124,6 +126,8 @@ bool cpu_step(struct CPU *cpu_handle)
         case ABS_EOR:
             break;
         case ABS_INC:
+            break;
+        case ABS_JSR:
             break;
         case ABS_LDA:
             break;
@@ -375,7 +379,7 @@ bool cpu_step(struct CPU *cpu_handle)
             break;
 
         default:
-            fprintf(stderr, "DEFAULT: %x\n", cpumem_read(&cpu_handle->memory, cpu_handle->pc));
+            fprintf(stderr, "DEFAULT: %x\n", cpumem_readb(&cpu_handle->memory, cpu_handle->pc));
             return false;
     }
     return true;
