@@ -160,6 +160,8 @@ typedef uint8_t byte_t;
 #define IMP_PLP         ((byte_t) 0x28)
 #define IMP_RTI         ((byte_t) 0x40)
 #define IMP_RTS         ((byte_t) 0x60)
+#define IMP_SEC         ((byte_t) 0x38)
+#define IMP_SED         ((byte_t) 0xF8)
 #define IMP_SEI         ((byte_t) 0x78)
 #define IMP_TAX         ((byte_t) 0xAA)
 #define IMP_TAY         ((byte_t) 0xA8)

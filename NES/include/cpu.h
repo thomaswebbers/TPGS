@@ -127,31 +127,31 @@ byte_t cpu_pop(struct CPU *cpu_handle);
  */
 byte_t cpu_peek(struct CPU *cpu_handle);
 
-void cpu_imm(struct CPU *cpu_handle);
+void cpu_imm(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_zp(struct CPU *cpu_handle);
+void cpu_zp(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_abs(struct CPU *cpu_handle);
+void cpu_abs(struct CPU *cpu_handle, byte_t *arg);
 
 void cpu_imp(struct CPU *cpu_handle);
 
 void cpu_acc(struct CPU *cpu_handle);
 
-void cpu_ixx(struct CPU *cpu_handle);
+void cpu_ixx(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_ixy(struct CPU *cpu_handle);
+void cpu_ixy(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_zpixx(struct CPU *cpu_handle);
+void cpu_zpixx(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_zpixy(struct CPU *cpu_handle);
+void cpu_zpixy(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_idr(struct CPU *cpu_handle);
+void cpu_idr(struct CPU *cpu_handle, byte_t *arg1, byte_t *arg2);
 
-void cpu_preii(struct CPU *cpu_handle);
+void cpu_preii(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_posii(struct CPU *cpu_handle);
+void cpu_posii(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_rel(struct CPU *cpu_handle);
+void cpu_rel(struct CPU *cpu_handle, byte_t *arg);
 
 void cpu_adc(struct CPU *cpu_handle, byte_t operand);
 

@@ -29,10 +29,12 @@ void cpu_add_cycles(struct CPU *cpu_handle, uint32_t cycles)
 
 bool cpu_step(struct CPU *cpu_handle)
 {
-    printf("opcode[%x]: %x ", cpu_handle->pc, cpumem_readb(&cpu_handle->memory, cpu_handle->pc));
-    unsigned int cycles = 0;
-    uint16_t pc_inc = 0;
-    switch(cpumem_readb(&cpu_handle->memory, cpu_handle->pc))
+    byte_t opcode = cpumem_readb(&cpu_handle->memory, cpu_handle->pc);
+    printf("opcode[%x]: %x \n", cpu_handle->pc, opcode);
+    byte_t arg1;
+    byte_t arg2;
+    cpu_handle->pc++;
+    switch(opcode)
     {
         /***********************************************
         **************Immediate Addressing**************
@@ -42,6 +44,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_LDA: case IMM_LDX: case IMM_LDY:
         case IMM_ORA: case IMM_SBC:
             printf("Immediate\n");
+            cpu_imm(cpu_handle, &arg1);
             break;
 
         /***********************************************
@@ -55,6 +58,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case ZP_ROL: case ZP_ROR: case ZP_SBC:
         case ZP_STA: case ZP_STX: case ZP_STY:
             printf("Zero Page\n");
+            cpu_zp(cpu_handle, &arg1);
             break;
 
         /***********************************************
@@ -68,7 +72,8 @@ bool cpu_step(struct CPU *cpu_handle)
         case ABS_ORA: case ABS_ROL: case ABS_ROR:
         case ABS_SBC: case ABS_STA: case ABS_STX:
         case ABS_STY:
-            printf("Absolute");
+            printf("Absolute\n");
+            cpu_abs(cpu_handle, &arg1);
             break;
 
         /***********************************************
@@ -79,10 +84,12 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMP_DEY: case IMP_INX: case IMP_INY:
         case IMP_NOP: case IMP_PHA: case IMP_PHP:
         case IMP_PLA: case IMP_PLP: case IMP_RTI:
-        case IMP_RTS: case IMP_SEI: case IMP_TAX:
-        case IMP_TAY: case IMP_TSX: case IMP_TXA:
-        case IMP_TXS: case IMP_TYA:
+        case IMP_RTS: case IMP_SEC: case IMP_SED:
+        case IMP_SEI: case IMP_TAX: case IMP_TAY:
+        case IMP_TSX: case IMP_TXA: case IMP_TXS:
+        case IMP_TYA:
             printf("Implied\n");
+            cpu_imp(cpu_handle);
             break;
 
         /***********************************************
@@ -91,6 +98,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case ACC_ASL: case ACC_LSR: case ACC_ROL:
         case ACC_ROR:
             printf("Accumulator\n");
+            cpu_acc(cpu_handle);
             break;
 
         /***********************************************
@@ -102,6 +110,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IXX_LSR: case IXX_ORA: case IXX_ROL:
         case IXX_ROR: case IXX_SBC: case IXX_STA:
             printf("Indexed X\n");
+            cpu_ixx(cpu_handle, &arg1);
             break;
 
         /***********************************************
@@ -111,6 +120,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IXY_EOR: case IXY_LDA: case IXY_LDX:
         case IXY_ORA: case IXY_SBC: case IXY_STA:
             printf("Indexed Y\n");
+            cpu_ixy(cpu_handle, &arg1);
             break;
 
         /***********************************************
@@ -123,6 +133,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case ZPIXX_ROR: case ZPIXX_SBC: case ZPIXX_STA:
         case ZPIXX_STY:
             printf("Zero Page Indexed X\n");
+            cpu_zpixx(cpu_handle, &arg1);
             break;
 
         /***********************************************
@@ -130,6 +141,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZPIXY_LDX: case ZPIXY_STX:
             printf("Zero Page Indexed Y\n");
+            cpu_zpixy(cpu_handle, &arg1);
             break;
 
         /***********************************************
@@ -137,6 +149,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case IDR_JMP:
             printf("Indirect\n");
+            cpu_idr(cpu_handle, &arg1, &arg2);
             break;
 
         /***********************************************
@@ -146,6 +159,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case PREII_EOR: case PREII_LDA: case PREII_ORA:
         case PREII_SBC: case PREII_STA:
             printf("Pre-Indexed Indirect\n");
+            cpu_preii(cpu_handle, &arg1);
             break;
 
         /***********************************************
@@ -155,6 +169,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case POSII_EOR: case POSII_LDA: case POSII_ORA:
         case POSII_SBC: case POSII_STA:
             printf("Post-Indexed Indirect\n");
+            cpu_posii(cpu_handle, &arg1);
             break;
 
         /***********************************************
@@ -164,18 +179,260 @@ bool cpu_step(struct CPU *cpu_handle)
         case REL_BMI: case REL_BNE: case REL_BPL:
         case REL_BVC: case REL_BVS:
             printf("Relative\n");
+            cpu_rel(cpu_handle, &arg1);
             break;
 
         default:
             fprintf(stderr, "DEFAULT: %x\n", cpumem_readb(&cpu_handle->memory, cpu_handle->pc));
             return false;
     }
-    switch()
-    {
 
+    switch(opcode)
+    {
+        case IMM_ADC:   case ZP_ADC:    case ABS_ADC:
+        case IXX_ADC:   case IXY_ADC:   case ZPIXX_ADC:
+        case PREII_ADC: case POSII_ADC:
+
+            break;
+
+        case IMM_AND:   case ZP_AND:    case ABS_AND:
+        case IXX_AND:   case IXY_AND:   case ZPIXX_AND:
+        case PREII_AND: case POSII_AND:
+
+            break;
+
+        case ZP_ASL:    case ABS_ASL:   case ACC_ASL:
+        case IXX_ASL:
+
+            break;
+
+        case REL_BCC:
+
+            break;
+
+        case REL_BCS:
+
+            break;
+
+        case REL_BEQ:
+
+            break;
+
+        case ZP_BIT:    case ABS_BIT:
+
+            break;
+
+        case REL_BMI:
+
+            break;
+
+        case REL_BNE:
+
+            break;
+
+        case REL_BPL;
+
+            break;
+
+        case IMP_BRK;
+
+            break;
+
+        case REL_BVC;
+
+            break;
+
+        case REL_BVS;
+
+            break;
+
+        case IMP_CLC;
+
+            break;
+
+        case IMP_CLD:
+
+            break;
+
+        case IMP_CLI;
+
+            break;
+
+        case IMP_CLV;
+
+            break;
+
+        case IMM_CMP:   case ZP_CMP:    case ABS_CMP:
+        case IXX_CMP:   case IXY_CMP:   case ZPIXX_CMP:
+        case PREII_CMP: case POSII_CMP:
+
+            break;
+
+        case IMM_CPX:   case ZP_CPX:    case ABS_CPX:
+
+            break;
+
+        case IMM_CPY:   case ZP_CPY:    case ABS_CPY:
+
+            break;
+
+        case ZP_DEC:    case ABS_DEC:   case IXX_DEC:
+        case ZPIXX_DEC:
+
+            break;
+
+        case IMP_DEX:
+
+            break;
+
+        case IMP_DEY:
+
+            break;
+
+        case IMM_EOR:   case ZP_EOR:    case ABS_EOR:
+        case IXX_EOR:   case IXY_EOR:   case ZPIXX_EOR:
+        case PREII_EOR: case POSII_EOR:
+
+            break;
+
+        case ZP_INC:    case ABS_INC:   case IXX_INC:
+        case ZPIXX_INC:
+
+            break;
+
+        case IMP_INX:
+
+            break;
+
+        case IMP_INY:
+
+            break;
+
+        case ABS_JMP:  case IDR_JMP:
+
+            break;
+
+        case ABS_JSR:
+
+            break;
+
+        case IMM_LDA:   case ZP_LDA:    case ABS_LDA:
+        case IXX_LDA:   case IXY_LDA:   case ZPIXX_LDA:
+        case PREII_LDA: case POSII_LDA:
+
+            break;
+
+        case IMM_LDX:   case ZP_LDX:    case ABS_LDX:
+        case IXY_LDX:   case ZPIXY_LDX:
+
+            break;
+
+        case IMM_LDY:   case ZP_LDY:    case ABS_LDY:
+        case IXX_LDY:   case ZPIXX_LDY:
+
+            break;
+
+        case ZP_LSR:    case ABS_LSR:   case ACC_LSR;
+        case IXX_LSR:   case ZPIXX_LSR:
+
+            break;
+
+        case IMP_NOP:
+
+            break;
+
+        case IMM_ORA:   case ZP_ORA:    case ABS_ORA:
+        case IXX_ORA:   case IXY_ORA:   case ZPIXX_ORA:
+        case PREII_ORA: case POSII_ORA:
+
+            break;
+
+        case IMP_PHA;
+
+            break;
+
+        case IMP_PHP:
+
+            break;
+
+        case IMP_PLA:
+
+            break;
+
+        case IMP_PLP:
+
+            break;
+
+        case ZP_ROL:    case ABS_ROL:   case ACC_ROL:
+        case IXX_ROL:   case ZPIXX_ROL:
+
+            break;
+
+        case ZP_ROR:    case ABS_ROR:   case ACC_ROR:
+        case IXX_ROR:   case ZPIXX_ROR:
+
+            break;
+
+        case IMP_RTI:
+
+            break;
+
+        case IMP_RTS:
+
+            break;
+
+        case IMM_SBC:   case ZP_SBC:    case ABS_SBC:
+        case IXX_SBC:   case IXY_SBC:   case ZPIXX_SBC:
+        case PREII_SBC: case POSII_SBC:
+
+            break;
+
+        case IMP_SEC:
+
+            break;
+
+        case IMP_SED:
+
+            break;
+
+        case IMP_SEI:
+
+            break;
+
+        case ZP_STA:    case ABS_STA:   case IXX_STA:
+        case IXY_STA:   case ZPIXX_STA: case PREII_STA:
+        case POSII_STA:
+
+            break;
+
+        case ZP_STX:    case ABS_STX:   case ZPIXY_STX:
+
+            break;
+
+        case ZP_STY:    case ABS_STY:   case ZPIXX_STY:
+
+            break;
+
+        case IMP_TAX:
+
+            break;
+
+        case IMP_TSX:
+
+            break;
+
+        case IMP_TXA:
+
+            break;
+
+        case IMP_TXS:
+
+            break;
+
+        case IMP_TYA:
+
+            break;
     }
-    cpu_handle->clock += cycles;
-    cpu_handle->pc += pc_inc;
     return true;
 }
 
@@ -192,6 +449,87 @@ byte_t cpu_pop(struct CPU *cpu_handle)
 byte_t cpu_peek(struct CPU *cpu_handle)
 {
     return cpu_handle->memory.RAM[0x100 + cpu_handle->sp - 1];
+}
+
+void cpu_imm(struct CPU *cpu_handle, byte_t *arg)
+{
+    *arg = cpumem_readb(&cpu_handle->memory, cpu_handle->pc);
+}
+
+void cpu_zp(struct CPU *cpu_handle, byte_t *arg)
+{
+    *arg =  cpumem_readb(&cpu_handle->memory,
+            cpumem_readb(&cpu_handle->memory, cpu_handle->pc++));
+}
+
+void cpu_abs(struct CPU *cpu_handle, byte_t *arg)
+{
+    *arg =  cpumem_readb(&cpu_handle->memory,
+            cpumem_reads(&cpu_handle->memory, cpu_handle->pc));
+    cpu_handle->pc += 2;
+}
+
+void cpu_imp(struct CPU *cpu_handle)
+{
+    cpu_handle->pc++;
+}
+
+void cpu_acc(struct CPU *cpu_handle)
+{
+    cpu_handle->pc++;
+}
+
+void cpu_ixx(struct CPU *cpu_handle, byte_t *arg)
+{
+    *arg =  cpumem_readb(&cpu_handle->memory, cpu_handle->X +
+            cpumem_reads(&cpu_handle->memory, cpu_handle->pc));
+    cpu_handle += 2;
+}
+
+void cpu_ixy(struct CPU *cpu_handle, byte_t *arg)
+{
+    *arg =  cpumem_readb(&cpu_handle->memory, cpu_handle->Y +
+            cpumem_reads(&cpu_handle->memory, cpu_handle->pc));
+    cpu_handle += 2;
+}
+
+void cpu_zpixx(struct CPU *cpu_handle, byte_t *arg)
+{
+    *arg =  cpumem_readb(&cpu_handle->memory, cpu_handle->X +
+            cpumem_readb(&cpu_handle->memory, cpu_handle->pc++));
+}
+
+void cpu_zpixy(struct CPU *cpu_handle, byte_t *arg)
+{
+    *arg =  cpumem_readb(&cpu_handle->memory, cpu_handle->Y +
+            cpumem_readb(&cpu_handle->memory, cpu_handle->pc++));
+}
+
+void cpu_idr(struct CPU *cpu_handle, byte_t *arg1, byte_t *arg2)
+{
+    uint16_t address = cpumem_reads(&cpu_handle->memory, cpu_handle->sp);
+    *arg1 = cpumem_readb(&cpu_handle->memory, address);
+    *arg2 = cpumem_readb(&cpu_handle->memory, address + 1);
+    cpu_handle->sp += 2;
+}
+
+void cpu_preii(struct CPU *cpu_handle, byte_t *arg)
+{
+    *arg =  cpumem_readb(&cpu_handle->memory,
+            cpumem_reads(&cpu_handle->memory, cpu_handle->X +
+            cpumem_readb(&cpu_handle->memory, cpu_handle->sp++)));
+}
+
+void cpu_posii(struct CPU *cpu_handle, byte_t *arg)
+{
+    *arg =  cpumem_readb(&cpu_handle->memory, cpu_handle->Y +
+            cpumem_reads(&cpu_handle->memory,
+            cpumem_readb(&cpu_handle->memory, cpu_handle->sp++)));
+}
+
+void cpu_rel(struct CPU *cpu_handle, byte_t *arg)
+{
+    *arg = cpumem_readb(&cpu_handle->memory, cpu_handle->sp++);
 }
 
 void cpu_adc(struct CPU *cpu_handle, byte_t operand)
