@@ -2,6 +2,7 @@
 #define CPUPS_H
 #include <stdbool.h>
 #include "opcodes.h"
+
 /*
  * Processor Status
  * =================
@@ -24,7 +25,7 @@ struct PSR
     bool B;   //Break Command
     //empty bit
     bool V;   //overflow
-    bool S;   //Negative
+    bool S;   //Negative (Sign)
 };
 
 void init_psr(struct PSR *psr_handle);

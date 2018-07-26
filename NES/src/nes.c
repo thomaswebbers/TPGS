@@ -14,13 +14,6 @@ int init_nes(struct NES **nes_handle, char *binary_file)
     init_mmc(&(**nes_handle).mmc, &(**nes_handle).cpu, &(**nes_handle).ppu, binary_file);
     init_cpu(&(**nes_handle).cpu);
     init_ppu(&(**nes_handle).ppu);
-    /*
-    if(!load_cartrige(&(**nes_handle).rom, binary_file))
-    {
-        free(*nes_handle);
-        return INIT_FAILURE;
-    }
-    */
     return INIT_SUCCES;
 }
 

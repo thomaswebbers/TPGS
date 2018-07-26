@@ -1,4 +1,5 @@
 #include "cpumem.h"
+#include <stdio.h>
 
 byte_t cpumem_readb(struct CPUmem *cpumem_handle, uint16_t address)
 {
@@ -33,8 +34,8 @@ void cpumem_writeb(struct CPUmem *cpumem_handle, uint16_t address, byte_t data)
         cpumem_handle->SRAM[address - 0x6000] = data;
     else if(address < 0xC000)
         cpumem_handle->PRG_low[address - 0x8000] = data;
-
-    cpumem_handle->PRG_high[address - 0xC000] = data;
+    else
+        cpumem_handle->PRG_high[address - 0xC000] = data;
 }
 
 uint16_t cpumem_reads(struct CPUmem *cpumem_handle, uint16_t address)
@@ -44,5 +45,6 @@ uint16_t cpumem_reads(struct CPUmem *cpumem_handle, uint16_t address)
 }
 void cpumem_writes(struct CPUmem *cpumem_handle, uint16_t address, uint16_t data)
 {
-
+    cpumem_writeb(cpumem_handle, address, (byte_t) data);
+    cpumem_writeb(cpumem_handle, address + 1, (byte_t) (data >> 8));
 }

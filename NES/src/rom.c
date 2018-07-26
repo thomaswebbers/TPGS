@@ -78,8 +78,6 @@ bool init_rom(struct ROM *rom_handle, char *binary_file)
     {
         rom_handle->prg[i] = malloc(sizeof(byte_t) * PRG_ROM_BANK_SIZE);
         fread(rom_handle->prg[i], sizeof(byte_t), PRG_ROM_BANK_SIZE, fp);
-        for(int j = 0x3FFF; j > 0x3FF0; j--)
-            printf("data[%x]: %x\n", j, rom_handle->prg[i][j]);
     }
 
     //allocate and read all banks for chr rom

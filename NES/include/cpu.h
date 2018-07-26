@@ -127,25 +127,51 @@ byte_t cpu_pop(struct CPU *cpu_handle);
  */
 byte_t cpu_peek(struct CPU *cpu_handle);
 
+void cpu_imm(struct CPU *cpu_handle);
+
+void cpu_zp(struct CPU *cpu_handle);
+
+void cpu_abs(struct CPU *cpu_handle);
+
+void cpu_imp(struct CPU *cpu_handle);
+
+void cpu_acc(struct CPU *cpu_handle);
+
+void cpu_ixx(struct CPU *cpu_handle);
+
+void cpu_ixy(struct CPU *cpu_handle);
+
+void cpu_zpixx(struct CPU *cpu_handle);
+
+void cpu_zpixy(struct CPU *cpu_handle);
+
+void cpu_idr(struct CPU *cpu_handle);
+
+void cpu_preii(struct CPU *cpu_handle);
+
+void cpu_posii(struct CPU *cpu_handle);
+
+void cpu_rel(struct CPU *cpu_handle);
+
 void cpu_adc(struct CPU *cpu_handle, byte_t operand);
 
 void cpu_and(struct CPU *cpu_handle, byte_t operand);
 
-void cpu_asl(struct CPU *cpu_handle);
+void cpu_asl(struct CPU *cpu_handle, byte_t *operand);
 
-void cpu_bcc(struct CPU *cpu_handle);
+void cpu_bcc(struct CPU *cpu_handle, int8_t offset);
 
-void cpu_bcs(struct CPU *cpu_handle);
+void cpu_bcs(struct CPU *cpu_handle, int8_t offset);
 
-void cpu_beq(struct CPU *cpu_handle);
+void cpu_beq(struct CPU *cpu_handle, int8_t offset);
 
-void cpu_bit(struct CPU *cpu_handle);
+void cpu_bit(struct CPU *cpu_handle, byte_t operand);
 
-void cpu_bmi(struct CPU *cpu_handle);
+void cpu_bmi(struct CPU *cpu_handle, int8_t offset);
 
-void cpu_bne(struct CPU *cpu_handle);
+void cpu_bne(struct CPU *cpu_handle, int8_t offset);
 
-void cpu_bpl(struct CPU *cpu_handle);
+void cpu_bpl(struct CPU *cpu_handle, int8_t offset);
 
 void cpu_brk(struct CPU *cpu_handle);
 
@@ -181,11 +207,11 @@ void cpu_inx(struct CPU *cpu_handle);
 
 void cpu_iny(struct CPU *cpu_handle);
 
-void cpu_jmp(struct CPU *cpu_handle);
+void cpu_jmp(struct CPU *cpu_handle, uint16_t address);
 
-void cpu_jsr(struct CPU *cpu_handle);
+void cpu_jsr(struct CPU *cpu_handle, uint16_t address);
 
-void cpu_lda(struct CPU *cpu_handle);
+void cpu_lda(struct CPU *cpu_handle, byte_t operand);
 
 void cpu_ldx(struct CPU *cpu_handle);
 
@@ -221,7 +247,7 @@ void cpu_sed(struct CPU *cpu_handle);
 
 void cpu_sei(struct CPU *cpu_handle);
 
-void cpu_sta(struct CPU *cpu_handle);
+void cpu_sta(struct CPU *cpu_handle, uint16_t address);
 
 void cpu_stx(struct CPU *cpu_handle);
 
