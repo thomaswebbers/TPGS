@@ -19,13 +19,13 @@ init_tests:
 
 begin_test:
      sta  <result
-     
+
      ; synchronize with nmi and clear
      lda  #-1
      sta  <nmi_count
 :    cmp  <nmi_count
      beq  -
-     
+
      rts
      .code
 
@@ -37,4 +37,3 @@ end_test:
      jsr  error_if_eq    ; too late
      rts
      .code
-

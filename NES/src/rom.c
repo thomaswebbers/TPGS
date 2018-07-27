@@ -68,6 +68,9 @@ bool init_rom(struct ROM *rom_handle, char *binary_file)
     if(numRAM == 0)
         numRAM = 1;
 
+    //test :D
+    rom_handle->sram = malloc(sizeof(byte_t) * 0x2000);
+
     //move past trainer data
     if(trainer == 1)
         fseek(fp, 0x200, SEEK_CUR);
@@ -87,6 +90,8 @@ bool init_rom(struct ROM *rom_handle, char *binary_file)
         rom_handle->chr[i] = malloc(sizeof(byte_t) * CHR_ROM_BANK_SIZE);
         fread(rom_handle->chr[i], sizeof(byte_t), CHR_ROM_BANK_SIZE, fp);
     }
+
+
 
     printf("num_prg:\t%x\n", rom_handle->num_prg);
     printf("num_chr:\t%x\n", rom_handle->num_chr);
@@ -112,4 +117,6 @@ void destroy_rom(struct ROM *rom_handle)
         free(rom_handle->chr[i]);
 
     free(rom_handle->chr);
+
+    free(rom_handle->sram);
 }

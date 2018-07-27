@@ -3,13 +3,13 @@
 debug_beeps:
 beep_loop:
 	pha
-	
+
 	lda #1      ; set up square 1
 	sta $4015
 	sta $4003
 	sta $4001
 	sta $4002
-	
+
 	lda #$0f        ; fade volume
 :   pha
 	eor #$30
@@ -20,12 +20,12 @@ beep_loop:
 	clc
 	adc #-1
 	bpl -
-	
+
 	lda #0
 	sta $4015       ; silence square for a bit
 	lda #120
 	jsr delay_msec
-	
+
 	pla
 	clc
 	adc #-1
@@ -119,7 +119,7 @@ debug_addr:
 	jsr hex_byte
 	jmp debug_byte_impl
 	.code
-	
+
 ; Print byte A to console as $hh
 ; Preserved: A, X, Y
 debug_byte:
@@ -134,7 +134,7 @@ debug_byte_impl:
 	jsr debug_char_no_wait
 	pla
 	rts
-	
+
 hex_byte:
 	pha
 	lsr a

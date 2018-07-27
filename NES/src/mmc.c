@@ -4,7 +4,8 @@
 #include "cpu.h"
 #include "ppu.h"
 
-#define NO_MAPPER       ((byte_t) 0x00)
+#define NROM            ((byte_t) 0x00)
+#define MMC1            ((byte_t) 0x01)
 
 void init_mmc(struct MMC *mmc_handle, struct CPU *cpu_handle, struct PPU *ppu_handle, char *binary_file)
 {
@@ -13,9 +14,10 @@ void init_mmc(struct MMC *mmc_handle, struct CPU *cpu_handle, struct PPU *ppu_ha
     mmc_handle->PRG_high_CPU = &cpu_handle->memory.PRG_high;
     mmc_handle->CHR_PPU = &ppu_handle->memory.pattern_table;
     init_rom(&mmc_handle->rom, binary_file);
+    *mmc_handle->SRAM_CPU = mmc_handle->rom.sram;
     switch(mmc_handle->rom.mapper)
     {
-        case NO_MAPPER:
+        case NROM:
             if(mmc_handle->rom.num_prg == 2)
             {
                 *mmc_handle->PRG_low_CPU = mmc_handle->rom.prg[0];
@@ -26,6 +28,9 @@ void init_mmc(struct MMC *mmc_handle, struct CPU *cpu_handle, struct PPU *ppu_ha
                 *mmc_handle->PRG_low_CPU = mmc_handle->rom.prg[0];
                 *mmc_handle->PRG_high_CPU = mmc_handle->rom.prg[0];
             }
+            break;
+        case MMC1:
+            printf("MMC1 support on its way! :D\n");
             break;
         default:
             printf("Mapper not yet implemented: %x\n", mmc_handle->rom.mapper);

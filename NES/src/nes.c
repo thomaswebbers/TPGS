@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "nes.h"
 #include "cpu.h"
@@ -21,7 +22,7 @@ void run_nes(struct NES *nes_handle)
 {
     while(step_nes(nes_handle))
     {
-
+        sleep(1);
     }
 }
 

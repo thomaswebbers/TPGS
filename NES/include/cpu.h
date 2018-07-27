@@ -213,15 +213,13 @@ void cpu_jsr(struct CPU *cpu_handle, byte_t *arg);
 
 void cpu_lda(struct CPU *cpu_handle, byte_t arg);
 
-void cpu_ldx(struct CPU *cpu_handle);
+void cpu_ldx(struct CPU *cpu_handle, byte_t arg);
 
-void cpu_ldy(struct CPU *cpu_handle);
+void cpu_ldy(struct CPU *cpu_handle, byte_t arg);
 
-void cpu_lsr(struct CPU *cpu_handle);
+void cpu_lsr(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_nop(struct CPU *cpu_handle);
-
-void cpu_ora(struct CPU *cpu_handle);
+void cpu_ora(struct CPU *cpu_handle, byte_t arg);
 
 void cpu_pha(struct CPU *cpu_handle);
 
@@ -231,15 +229,15 @@ void cpu_pla(struct CPU *cpu_handle);
 
 void cpu_plp(struct CPU *cpu_handle);
 
-void cpu_rol(struct CPU *cpu_handle);
+void cpu_rol(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_ror(struct CPU *cpu_handle);
+void cpu_ror(struct CPU *cpu_handle, byte_t *arg);
 
 void cpu_rti(struct CPU *cpu_handle);
 
 void cpu_rts(struct CPU *cpu_handle);
 
-void cpu_sbc(struct CPU *cpu_handle);
+void cpu_sbc(struct CPU *cpu_handle, byte_t arg);
 
 void cpu_sec(struct CPU *cpu_handle);
 
@@ -247,11 +245,11 @@ void cpu_sed(struct CPU *cpu_handle);
 
 void cpu_sei(struct CPU *cpu_handle);
 
-void cpu_sta(struct CPU *cpu_handle, uint16_t address);
+void cpu_sta(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_stx(struct CPU *cpu_handle);
+void cpu_stx(struct CPU *cpu_handle, byte_t *arg);
 
-void cpu_sty(struct CPU *cpu_handle);
+void cpu_sty(struct CPU *cpu_handle, byte_t *arg);
 
 void cpu_tax(struct CPU *cpu_handle);
 

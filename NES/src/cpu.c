@@ -416,7 +416,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_LDA:   case ZP_LDA:    case ABS_LDA:
         case IXX_LDA:   case IXY_LDA:   case ZPIXX_LDA:
         case PREII_LDA: case POSII_LDA:
-
+			cpu_lda(cpu_handle, *arg);
             break;
 
         /***********************************************
@@ -424,7 +424,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case IMM_LDX:   case ZP_LDX:    case ABS_LDX:
         case IXY_LDX:   case ZPIXY_LDX:
-
+			cpu_ldx(cpu_handle, *arg);
             break;
 
         /***********************************************
@@ -432,7 +432,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case IMM_LDY:   case ZP_LDY:    case ABS_LDY:
         case IXX_LDY:   case ZPIXX_LDY:
-
+			cpu_ldy(cpu_handle, *arg);
             break;
 
         /***********************************************
@@ -440,14 +440,13 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZP_LSR:    case ABS_LSR:   case ACC_LSR:
         case IXX_LSR:   case ZPIXX_LSR:
-
+			cpu_lsr(cpu_handle, arg);
             break;
 
         /***********************************************
         ******************No Operation******************
         ***********************************************/
         case IMP_NOP:
-
             break;
 
         /***********************************************
@@ -456,35 +455,35 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_ORA:   case ZP_ORA:    case ABS_ORA:
         case IXX_ORA:   case IXY_ORA:   case ZPIXX_ORA:
         case PREII_ORA: case POSII_ORA:
-
+			cpu_ora(cpu_handle, *arg);
             break;
 
         /***********************************************
         ****************Push A on Stack*****************
         ***********************************************/
         case IMP_PHA:
-
+			cpu_pha(cpu_handle);
             break;
 
         /***********************************************
         *********Push Processor Status on Stack*********
         ***********************************************/
         case IMP_PHP:
-
+			cpu_php(cpu_handle);
             break;
 
         /***********************************************
         ***************Pull A from Stack****************
         ***********************************************/
         case IMP_PLA:
-
+			cpu_pla(cpu_handle);
             break;
 
         /***********************************************
         ********Pull Processor Status from Stack********
         ***********************************************/
         case IMP_PLP:
-
+			cpu_plp(cpu_handle);
             break;
 
         /***********************************************
@@ -492,7 +491,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZP_ROL:    case ABS_ROL:   case ACC_ROL:
         case IXX_ROL:   case ZPIXX_ROL:
-
+			cpu_rol(cpu_handle, arg);
             break;
 
         /***********************************************
@@ -500,21 +499,21 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZP_ROR:    case ABS_ROR:   case ACC_ROR:
         case IXX_ROR:   case ZPIXX_ROR:
-
+			cpu_ror(cpu_handle, arg);
             break;
 
         /***********************************************
         *************Return from Interrupt**************
         ***********************************************/
         case IMP_RTI:
-
+			cpu_rti(cpu_handle);
             break;
 
         /***********************************************
         *************Return from Subroutine*************
         ***********************************************/
         case IMP_RTS:
-
+			cpu_rts(cpu_handle);
             break;
 
         /***********************************************
@@ -523,28 +522,28 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_SBC:   case ZP_SBC:    case ABS_SBC:
         case IXX_SBC:   case IXY_SBC:   case ZPIXX_SBC:
         case PREII_SBC: case POSII_SBC:
-
+			cpu_sbc(cpu_handle, *arg);
             break;
 
         /***********************************************
         *****************Set Carry Flag*****************
         ***********************************************/
         case IMP_SEC:
-
+			cpu_sec(cpu_handle);
             break;
 
         /***********************************************
         ****************Set Decimal Mode****************
         ***********************************************/
         case IMP_SED:
-
+			cpu_sed(cpu_handle);
             break;
 
         /***********************************************
         **********Set Interrupt Disable Status**********
         ***********************************************/
         case IMP_SEI:
-
+			cpu_sei(cpu_handle);
             break;
 
         /***********************************************
@@ -553,56 +552,56 @@ bool cpu_step(struct CPU *cpu_handle)
         case ZP_STA:    case ABS_STA:   case IXX_STA:
         case IXY_STA:   case ZPIXX_STA: case PREII_STA:
         case POSII_STA:
-
+			cpu_sta(cpu_handle, arg);
             break;
 
         /***********************************************
         ******************Store X in M******************
         ***********************************************/
         case ZP_STX:    case ABS_STX:   case ZPIXY_STX:
-
+			cpu_stx(cpu_handle, arg);
             break;
 
         /***********************************************
         ******************Store Y in M******************
         ***********************************************/
         case ZP_STY:    case ABS_STY:   case ZPIXX_STY:
-
+			cpu_sty(cpu_handle, arg);
             break;
 
         /***********************************************
         *****************Transfer A to X****************
         ***********************************************/
         case IMP_TAX:
-
+			cpu_tax(cpu_handle);
             break;
 
         /***********************************************
         **********Transfer Stack Pointer to X***********
         ***********************************************/
         case IMP_TSX:
-
+			cpu_tsx(cpu_handle);
             break;
 
         /***********************************************
         *****************Transfer X to A****************
         ***********************************************/
         case IMP_TXA:
-
+			cpu_txa(cpu_handle);
             break;
 
         /***********************************************
         **********Transfer X to Stack Pointer***********
         ***********************************************/
         case IMP_TXS:
-
+			cpu_txs(cpu_handle);
             break;
 
         /***********************************************
         *****************Transfer Y to A****************
         ***********************************************/
         case IMP_TYA:
-
+			cpu_tya(cpu_handle);
             break;
     }
     return true;
@@ -1006,42 +1005,62 @@ void cpu_pla(struct CPU *cpu_handle)
 
 void cpu_plp(struct CPU *cpu_handle)
 {
-    cpu_handle->P = byte_as_psr(cpu_handle->P, cpu_pop(cpu_handle));
+    byte_as_psr(&cpu_handle->P, cpu_pop(cpu_handle));
 }
 
-void cpu_rol(struct CPU *cpu_handle)
+void cpu_rol(struct CPU *cpu_handle, byte_t *arg)
 {
-
+	bool carry = ((*arg & 0x80) == 0x80);
+	*arg <<= 1;
+	*arg |= cpu_handle->P.C;
+	cpu_handle->P.C = carry;
+	cpu_handle->P.S = (*arg > 0x7F);
+    cpu_handle->P.Z = (*arg == 0);
 }
 
-void cpu_ror(struct CPU *cpu_handle)
+void cpu_ror(struct CPU *cpu_handle, byte_t *arg)
 {
-
+	bool carry = ((*arg & 0x01) == 0x01);
+	*arg >>= 1;
+	*arg |= (cpu_handle->P.C << 7);
+	cpu_handle->P.C = carry;
+	cpu_handle->P.S = (*arg > 0x7F);
+    cpu_handle->P.Z = (*arg == 0);
 }
 
 void cpu_rti(struct CPU *cpu_handle)
 {
-
+	byte_as_psr(&cpu_handle->P, cpu_pop(cpu_handle));
+	byte_t low = cpu_pop(cpu_handle);
+	cpu_handle->pc = (cpu_pop(cpu_handle) << 8) | low;
 }
 
 void cpu_rts(struct CPU *cpu_handle)
 {
-
+	byte_t low = cpu_pop(cpu_handle);
+	cpu_handle->pc = (cpu_pop(cpu_handle) << 8) | low;
 }
 
-void cpu_sbc(struct CPU *cpu_handle)
+void cpu_sbc(struct CPU *cpu_handle, byte_t arg)
 {
+	uint16_t temp = cpu_handle->A - arg - cpu_handle->P.C;
+	cpu_handle->P.V =   !((cpu_handle->A ^ arg) & 0x80)
+						&& ((cpu_handle->A ^ temp) & 0x80);
+    cpu_handle->A = (byte_t) temp;
+    cpu_handle->P.Z = (cpu_handle->A == 0);
+    cpu_handle->P.S = (cpu_handle->A > 0x7F);
+    cpu_handle->P.C = (temp > 0xff);
 
 }
 
 void cpu_sec(struct CPU *cpu_handle)
 {
-
+	cpu_handle->P.C = true;
 }
 
 void cpu_sed(struct CPU *cpu_handle)
 {
-
+	cpu_handle->P.D = true;
 }
 
 void cpu_sei(struct CPU *cpu_handle)
@@ -1049,50 +1068,57 @@ void cpu_sei(struct CPU *cpu_handle)
     cpu_handle->P.I = true;
 }
 
-void cpu_sta(struct CPU *cpu_handle, uint16_t address)
+void cpu_sta(struct CPU *cpu_handle, byte_t *arg)
 {
-    printf("address: %x\n", address);
-    printf("ptr: %p\n", cpu_handle->memory.PPU_IO);
-    cpumem_writeb(&cpu_handle->memory, address, cpu_handle->A);
-    printf("test?\n");
+	*arg = cpu_handle->A;
 }
 
-void cpu_stx(struct CPU *cpu_handle)
+void cpu_stx(struct CPU *cpu_handle, byte_t *arg)
 {
-
+	*arg = cpu_handle->X;
 }
 
-void cpu_sty(struct CPU *cpu_handle)
+void cpu_sty(struct CPU *cpu_handle, byte_t *arg)
 {
-
+	*arg = cpu_handle->Y;
 }
 
 void cpu_tax(struct CPU *cpu_handle)
 {
-
+	cpu_handle->X = cpu_handle->A;
+	cpu_handle->P.Z = (cpu_handle->X == 0);
+    cpu_handle->P.S = (cpu_handle->X > 0x7F);
 }
 
 void cpu_tay(struct CPU *cpu_handle)
 {
-
+	cpu_handle->Y = cpu_handle->A;
+	cpu_handle->P.Z = (cpu_handle->Y == 0);
+    cpu_handle->P.S = (cpu_handle->Y > 0x7F);
 }
 
 void cpu_tsx(struct CPU *cpu_handle)
 {
-
+	cpu_handle->X = cpu_handle->sp;
+	cpu_handle->P.Z = (cpu_handle->X == 0);
+    cpu_handle->P.S = (cpu_handle->X > 0x7F);
 }
 
 void cpu_txa(struct CPU *cpu_handle)
 {
-
+	cpu_handle->A = cpu_handle->X;
+	cpu_handle->P.Z = (cpu_handle->A == 0);
+	cpu_handle->P.S = (cpu_handle->A > 0x7F);
 }
 
 void cpu_txs(struct CPU *cpu_handle)
 {
-
+	cpu_handle->sp = cpu_handle->X;
 }
 
 void cpu_tya(struct CPU *cpu_handle)
 {
-
+	cpu_handle->A = cpu_handle->Y;
+	cpu_handle->P.Z = (cpu_handle->A == 0);
+	cpu_handle->P.S = (cpu_handle->A > 0x7F);
 }

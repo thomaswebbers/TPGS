@@ -5,7 +5,7 @@
 test_name:
      .db  "BRANCH TIMING BASICS",0
      .code
-     
+
 delay7 = $20
 
 delay1:
@@ -31,11 +31,11 @@ delay6:
 
 reset:
      jsr  init_tests
-     
+
      lda  #$EA      ; nop
      sta  delay7
      lda  #$60      ; rts
-     sta  delay7 + 1     
+     sta  delay7 + 1
      lda  #2;) NMI period is too short/3)too long
      jsr  begin_test
      jsr  delay7
@@ -47,11 +47,11 @@ reset:
      jsr  delay1
      jsr  delay1
      jsr  end_test
-     
+
      lda  #$B0      ; bcs
      sta  delay7
      lda  #$60      ; rts
-     sta  delay7 + 2     
+     sta  delay7 + 2
      lda  #4;) Branch not taken is too long/5)too short
      jsr  begin_test
      clc
@@ -64,7 +64,7 @@ reset:
      jsr  delay1
      jsr  delay1
      jsr  end_test
-     
+
      lda  #6;) Branch taken is too long/7)too short
      jsr  begin_test
      ldy  #24
@@ -74,5 +74,5 @@ reset:
      dey
      bne  -
      jsr  end_test
-     
+
      jmp  tests_passed
