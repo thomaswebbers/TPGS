@@ -21,7 +21,7 @@ struct PSR
     bool C;   //Carry
     bool Z;   //Zero
     bool I;   //Interrupt Disable
-    //decimal mode unsupported so omitted
+    bool D;   //Decimal Mode
     bool B;   //Break Command
     //empty bit
     bool V;   //overflow
@@ -39,5 +39,7 @@ void init_psr(struct PSR *psr_handle);
  * @return Processor Status Register P as byte
  */
 byte_t psr_as_byte(struct PSR *psr_handle);
+
+void byte_as_psr(struct PSR *psr_handle, byte_t flags);
 
 #endif

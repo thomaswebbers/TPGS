@@ -51,7 +51,7 @@ typedef uint8_t byte_t;
  * DEC      - Decrement M by One
  * DEX      - Decrement X by One
  * DEY      - Decrement Y by One
- * EOR      - "Exclusive     -Or" M with A
+ * EOR      - "Exclusive-Or" M with A
  * INC      - Increment M by One
  * INX      - Increment X by One
  * INY      - Increment Y by One
@@ -256,15 +256,6 @@ typedef uint8_t byte_t;
  * NES correctly, the amount of cycles used by each operation should be taken
  * into account.
  */
-
-#define C_ONE           ((uint32_t) 1)
-#define C_TWO           ((uint32_t) 2)
-#define C_THREE         ((uint32_t) 3)
-#define C_FOUR          ((uint32_t) 4)
-#define C_FIVE          ((uint32_t) 5)
-#define C_SIX           ((uint32_t) 6)
-#define C_SEVEN         ((uint32_t) 7)
-
 //A cycle to be added if Indexing Accros Page Boundary
 #define C_IAPB          ((uint32_t) 1)
 //A cycle to be added if a Branch is Taken

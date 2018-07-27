@@ -46,7 +46,7 @@ struct CPUmem
  *
  * @return the byte at the specified address
  */
-byte_t cpumem_readb(struct CPUmem *cpumem_handle, uint16_t address);
+byte_t *cpumem_readbp(struct CPUmem *cpumem_handle, uint16_t address);
 
 /*
  * Writes a byte to the cpu memory.
