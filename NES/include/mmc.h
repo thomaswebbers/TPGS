@@ -7,10 +7,6 @@
 
 struct MMC
 {
-    byte_t reg0;
-    byte_t reg1;
-    byte_t reg2;
-    byte_t reg3;
     struct ROM rom;
     byte_t **SRAM_CPU;
     byte_t **PRG_low_CPU;

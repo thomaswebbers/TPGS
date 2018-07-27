@@ -85,11 +85,11 @@ bool cpu_step(struct CPU *cpu_handle)
         case ABS_ADC: case ABS_AND: case ABS_ASL:
         case ABS_BIT: case ABS_CMP: case ABS_CPX:
         case ABS_CPY: case ABS_DEC: case ABS_EOR:
-        case ABS_INC: case ABS_JSR: case ABS_LDA:
-        case ABS_LDX: case ABS_LDY: case ABS_LSR:
-        case ABS_ORA: case ABS_ROL: case ABS_ROR:
-        case ABS_SBC: case ABS_STA: case ABS_STX:
-        case ABS_STY:
+        case ABS_INC: case ABS_JMP: case ABS_JSR:
+		case ABS_LDA: case ABS_LDX: case ABS_LDY:
+		case ABS_LSR: case ABS_ORA: case ABS_ROL:
+		case ABS_ROR: case ABS_SBC: case ABS_STA:
+		case ABS_STX: case ABS_STY:
             cpu_abs(cpu_handle, &arg);
             break;
 
@@ -105,7 +105,6 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMP_SEI: case IMP_TAX: case IMP_TAY:
         case IMP_TSX: case IMP_TXA: case IMP_TXS:
         case IMP_TYA:
-            cpu_imp(cpu_handle);
             break;
 
         /***********************************************
@@ -624,7 +623,7 @@ byte_t cpu_peek(struct CPU *cpu_handle)
 
 void cpu_imm(struct CPU *cpu_handle, byte_t **arg)
 {
-    *arg = cpumem_readbp(&cpu_handle->memory, cpu_handle->pc);
+    *arg = cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++);
 }
 
 void cpu_zp(struct CPU *cpu_handle, byte_t **arg)
@@ -638,11 +637,6 @@ void cpu_abs(struct CPU *cpu_handle, byte_t **arg)
     *arg =  cpumem_readbp(&cpu_handle->memory,
             cpumem_reads(&cpu_handle->memory, cpu_handle->pc));
     cpu_handle->pc += 2;
-}
-
-void cpu_imp(struct CPU *cpu_handle)
-{
-    cpu_handle->pc++;
 }
 
 void cpu_acc(struct CPU *cpu_handle, byte_t **arg)

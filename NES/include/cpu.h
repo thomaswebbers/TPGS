@@ -133,8 +133,6 @@ void cpu_zp(struct CPU *cpu_handle, byte_t **arg);
 
 void cpu_abs(struct CPU *cpu_handle, byte_t **arg);
 
-void cpu_imp(struct CPU *cpu_handle);
-
 void cpu_acc(struct CPU *cpu_handle, byte_t **arg);
 
 void cpu_ixx(struct CPU *cpu_handle, byte_t **arg);
