@@ -27,6 +27,41 @@ const byte_t opcode_cycles[256] =
 	2, 5, 0, 0, 0, 4, 6, 0, 2, 4, 0, 0, 0, 4, 7, 0,
 };
 
+char op_names[256][4] = {
+	"BRK", "ORA", "KIL", "SLO", "NOP", "ORA", "ASL", "SLO",
+	"PHP", "ORA", "ASL", "ANC", "NOP", "ORA", "ASL", "SLO",
+	"BPL", "ORA", "KIL", "SLO", "NOP", "ORA", "ASL", "SLO",
+	"CLC", "ORA", "NOP", "SLO", "NOP", "ORA", "ASL", "SLO",
+	"JSR", "AND", "KIL", "RLA", "BIT", "AND", "ROL", "RLA",
+	"PLP", "AND", "ROL", "ANC", "BIT", "AND", "ROL", "RLA",
+	"BMI", "AND", "KIL", "RLA", "NOP", "AND", "ROL", "RLA",
+	"SEC", "AND", "NOP", "RLA", "NOP", "AND", "ROL", "RLA",
+	"RTI", "EOR", "KIL", "SRE", "NOP", "EOR", "LSR", "SRE",
+	"PHA", "EOR", "LSR", "ALR", "JMP", "EOR", "LSR", "SRE",
+	"BVC", "EOR", "KIL", "SRE", "NOP", "EOR", "LSR", "SRE",
+	"CLI", "EOR", "NOP", "SRE", "NOP", "EOR", "LSR", "SRE",
+	"RTS", "ADC", "KIL", "RRA", "NOP", "ADC", "ROR", "RRA",
+	"PLA", "ADC", "ROR", "ARR", "JMP", "ADC", "ROR", "RRA",
+	"BVS", "ADC", "KIL", "RRA", "NOP", "ADC", "ROR", "RRA",
+	"SEI", "ADC", "NOP", "RRA", "NOP", "ADC", "ROR", "RRA",
+	"NOP", "STA", "NOP", "SAX", "STY", "STA", "STX", "SAX",
+	"DEY", "NOP", "TXA", "XAA", "STY", "STA", "STX", "SAX",
+	"BCC", "STA", "KIL", "AHX", "STY", "STA", "STX", "SAX",
+	"TYA", "STA", "TXS", "TAS", "SHY", "STA", "SHX", "AHX",
+	"LDY", "LDA", "LDX", "LAX", "LDY", "LDA", "LDX", "LAX",
+	"TAY", "LDA", "TAX", "LAX", "LDY", "LDA", "LDX", "LAX",
+	"BCS", "LDA", "KIL", "LAX", "LDY", "LDA", "LDX", "LAX",
+	"CLV", "LDA", "TSX", "LAS", "LDY", "LDA", "LDX", "LAX",
+	"CPY", "CMP", "NOP", "DCP", "CPY", "CMP", "DEC", "DCP",
+	"INY", "CMP", "DEX", "AXS", "CPY", "CMP", "DEC", "DCP",
+	"BNE", "CMP", "KIL", "DCP", "NOP", "CMP", "DEC", "DCP",
+	"CLD", "CMP", "NOP", "DCP", "NOP", "CMP", "DEC", "DCP",
+	"CPX", "SBC", "NOP", "ISC", "CPX", "SBC", "INC", "ISC",
+	"INX", "SBC", "NOP", "SBC", "CPX", "SBC", "INC", "ISC",
+	"BEQ", "SBC", "KIL", "ISC", "NOP", "SBC", "INC", "ISC",
+	"SED", "SBC", "NOP", "ISC", "NOP", "SBC", "INC", "ISC",
+};
+
 void init_cpu(struct CPU *cpu_handle, struct MMCbuf *buffer)
 {
     cpu_handle->clock = 0;
@@ -52,7 +87,7 @@ void cpu_add_cycles(struct CPU *cpu_handle, uint32_t cycles)
 bool cpu_step(struct CPU *cpu_handle)
 {
     byte_t opcode = *cpumem_readbp(&cpu_handle->memory, cpu_handle->pc);
-    printf("opcode[%x]: %x \n", cpu_handle->pc, opcode);
+    printf("opcode[%x]: %x ", cpu_handle->pc, opcode);
     byte_t *arg;
     cpu_handle->pc++;
     cpu_handle->clock += opcode_cycles[opcode];
@@ -65,6 +100,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_CPX: case IMM_CPY: case IMM_EOR:
         case IMM_LDA: case IMM_LDX: case IMM_LDY:
         case IMM_ORA: case IMM_SBC:
+			printf("IMM_");
             cpu_imm(cpu_handle, &arg);
             break;
 
@@ -78,6 +114,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case ZP_LDY: case ZP_LSR: case ZP_ORA:
         case ZP_ROL: case ZP_ROR: case ZP_SBC:
         case ZP_STA: case ZP_STX: case ZP_STY:
+			printf("ZP_");
             cpu_zp(cpu_handle, &arg);
             break;
 
@@ -92,6 +129,7 @@ bool cpu_step(struct CPU *cpu_handle)
 		case ABS_LSR: case ABS_ORA: case ABS_ROL:
 		case ABS_ROR: case ABS_SBC: case ABS_STA:
 		case ABS_STX: case ABS_STY:
+			printf("ABS_");
             cpu_abs(cpu_handle, &arg);
             break;
 
@@ -107,6 +145,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMP_SEI: case IMP_TAX: case IMP_TAY:
         case IMP_TSX: case IMP_TXA: case IMP_TXS:
         case IMP_TYA:
+			printf("IMP_");
             break;
 
         /***********************************************
@@ -114,6 +153,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ACC_ASL: case ACC_LSR: case ACC_ROL:
         case ACC_ROR:
+			printf("ACC_");
             cpu_acc(cpu_handle, &arg);
             break;
 
@@ -125,6 +165,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IXX_INC: case IXX_LDA: case IXX_LDY:
         case IXX_LSR: case IXX_ORA: case IXX_ROL:
         case IXX_ROR: case IXX_SBC: case IXX_STA:
+			printf("IXX_");
             cpu_ixx(cpu_handle, &arg);
             break;
 
@@ -134,6 +175,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IXY_ADC: case IXY_AND: case IXY_CMP:
         case IXY_EOR: case IXY_LDA: case IXY_LDX:
         case IXY_ORA: case IXY_SBC: case IXY_STA:
+			printf("IXY_");
             cpu_ixy(cpu_handle, &arg);
             break;
 
@@ -146,6 +188,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case ZPIXX_LSR: case ZPIXX_ORA: case ZPIXX_ROL:
         case ZPIXX_ROR: case ZPIXX_SBC: case ZPIXX_STA:
         case ZPIXX_STY:
+			printf("ZPIXX_");
             cpu_zpixx(cpu_handle, &arg);
             break;
 
@@ -153,6 +196,7 @@ bool cpu_step(struct CPU *cpu_handle)
         *Zero-Page Indexed Addressing(index register Y)*
         ***********************************************/
         case ZPIXY_LDX: case ZPIXY_STX:
+			printf("ZPIXY_");
             cpu_zpixy(cpu_handle, &arg);
             break;
 
@@ -160,6 +204,7 @@ bool cpu_step(struct CPU *cpu_handle)
         **************Indirect Addressing***************
         ***********************************************/
         case IDR_JMP:
+			printf("IDR_");
             cpu_idr(cpu_handle, &arg);
             break;
 
@@ -169,6 +214,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case PREII_ADC: case PREII_AND: case PREII_CMP:
         case PREII_EOR: case PREII_LDA: case PREII_ORA:
         case PREII_SBC: case PREII_STA:
+			printf("PREII_");
             cpu_preii(cpu_handle, &arg);
             break;
 
@@ -178,6 +224,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case POSII_ADC: case POSII_AND: case POSII_CMP:
         case POSII_EOR: case POSII_LDA: case POSII_ORA:
         case POSII_SBC: case POSII_STA:
+			printf("POSII_");
             cpu_posii(cpu_handle, &arg);
             break;
 
@@ -187,6 +234,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case REL_BCC: case REL_BCS: case REL_BEQ:
         case REL_BMI: case REL_BNE: case REL_BPL:
         case REL_BVC: case REL_BVS:
+			printf("REL_");
             cpu_rel(cpu_handle, &arg);
             break;
 
@@ -194,7 +242,7 @@ bool cpu_step(struct CPU *cpu_handle)
             fprintf(stderr, "DEFAULT: %x\n", opcode);
             return false;
     }
-
+	printf("%c%c%c\n", op_names[opcode][0], op_names[opcode][1], op_names[opcode][2]);
     switch(opcode)
     {
         /***********************************************
@@ -644,14 +692,14 @@ void cpu_abs(struct CPU *cpu_handle, byte_t **arg)
 void cpu_acc(struct CPU *cpu_handle, byte_t **arg)
 {
     *arg = &cpu_handle->A;
-    cpu_handle->pc++;
+    cpu_handle->pc;
 }
 
 void cpu_ixx(struct CPU *cpu_handle, byte_t **arg)
 {
     *arg =  cpumem_readbp(&cpu_handle->memory, cpu_handle->X +
             cpumem_reads(&cpu_handle->memory, cpu_handle->pc));
-    cpu_handle += 2;
+    cpu_handle->pc += 2;
 }
 
 void cpu_ixy(struct CPU *cpu_handle, byte_t **arg)

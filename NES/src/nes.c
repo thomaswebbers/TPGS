@@ -25,7 +25,7 @@ void run_nes(struct NES *nes_handle)
 {
     while(step_nes(nes_handle))
     {
-        sleep(1);
+        //sleep(1);
     }
 }
 
