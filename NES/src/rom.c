@@ -76,20 +76,12 @@ bool init_rom(struct ROM *rom_handle, char *binary_file)
         fseek(fp, 0x200, SEEK_CUR);
 
     //allocate and read all banks for prg rom
-    rom_handle->prg = malloc(sizeof(byte_t *) * rom_handle->num_prg);
-    for(int i = 0; i < rom_handle->num_prg; i++)
-    {
-        rom_handle->prg[i] = malloc(sizeof(byte_t) * PRG_ROM_BANK_SIZE);
-        fread(rom_handle->prg[i], sizeof(byte_t), PRG_ROM_BANK_SIZE, fp);
-    }
+    rom_handle->prg = malloc(sizeof(byte_t *) * rom_handle->num_prg * PRG_ROM_BANK_SIZE);
+    fread(rom_handle->prg, sizeof(byte_t), PRG_ROM_BANK_SIZE * rom_handle->num_prg, fp);
 
     //allocate and read all banks for chr rom
-    rom_handle->chr = malloc(sizeof(byte_t *) * rom_handle->num_chr);
-    for(int i = 0; i < rom_handle->num_chr; i++)
-    {
-        rom_handle->chr[i] = malloc(sizeof(byte_t) * CHR_ROM_BANK_SIZE);
-        fread(rom_handle->chr[i], sizeof(byte_t), CHR_ROM_BANK_SIZE, fp);
-    }
+    rom_handle->chr = malloc(sizeof(byte_t *) * rom_handle->num_chr * CHR_ROM_BANK_SIZE);
+    fread(rom_handle->chr, sizeof(byte_t), CHR_ROM_BANK_SIZE * rom_handle->num_chr, fp);
 
 
 
@@ -108,13 +100,7 @@ bool init_rom(struct ROM *rom_handle, char *binary_file)
 
 void destroy_rom(struct ROM *rom_handle)
 {
-    for(int i = 0; i < rom_handle->num_prg; i++)
-        free(rom_handle->prg[i]);
-
     free(rom_handle->prg);
-
-    for(int i = 0; i < rom_handle->num_chr; i++)
-        free(rom_handle->chr[i]);
 
     free(rom_handle->chr);
 

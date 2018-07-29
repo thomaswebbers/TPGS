@@ -2,19 +2,22 @@
 #define MMC_H
 #include "opcodes.h"
 #include "rom.h"
-#include "cpu.h"
-#include "ppu.h"
+#include "mmcbuf.h"
+#include "cpumem.h"
+#include "ppumem.h"
 
 struct MMC
 {
     struct ROM rom;
-    byte_t **SRAM_CPU;
-    byte_t **PRG_low_CPU;
-    byte_t **PRG_high_CPU;
-    byte_t **CHR_PPU;
+    struct CPUmem *cpu_mem;
+    struct PPUmem *ppu_mem;
+    struct MMCbuf buffer;
+    byte_t shift_register;
 };
 
-void init_mmc(struct MMC *mmc_handle, struct CPU *cpu_handle, struct PPU *ppu_handle, char *binary_file);
+void init_mmc(struct MMC *mmc_handle, struct CPUmem *cpumem_handle, struct PPUmem *ppumem_handle, char *binary_file);
+
+void step_mmc(struct MMC *mmc_handle);
 
 void destroy_mmc(struct MMC *mmc_handle);
 

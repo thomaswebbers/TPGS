@@ -5,6 +5,7 @@
 #include "opcodes.h"
 #include "cpumem.h"
 #include "psr.h"
+#include "mmcbuf.h"
 
 struct CPU
 {
@@ -62,13 +63,14 @@ struct CPU
 };
 
 /*
- * Sets all registers in the CPU to 0.
+ * Sets all registers in the CPU to 0. Initiates the pc with the reset vector.
+ * The addresses for the mmc buffers are also set.
  *
  * @param cpu_handle a handle to the nes virtual machine cpu
  *
  * @return void
  */
-void init_cpu(struct CPU *cpu_handle);
+void init_cpu(struct CPU *cpu_handle, struct MMCbuf *buffer);
 
 /*
  * Adds an amount of cycles to the clock of the cpu. The amount added should

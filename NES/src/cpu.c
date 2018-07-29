@@ -5,6 +5,7 @@
 #include "cpu.h"
 #include "cpumem.h"
 #include "psr.h"
+#include "mmcbuf.h"
 
 const byte_t opcode_cycles[256] =
 {
@@ -26,7 +27,7 @@ const byte_t opcode_cycles[256] =
 	2, 5, 0, 0, 0, 4, 6, 0, 2, 4, 0, 0, 0, 4, 7, 0,
 };
 
-void init_cpu(struct CPU *cpu_handle)
+void init_cpu(struct CPU *cpu_handle, struct MMCbuf *buffer)
 {
     cpu_handle->clock = 0;
     cpu_handle->pc = cpumem_reads(&cpu_handle->memory, RESET_VEC);
@@ -35,6 +36,7 @@ void init_cpu(struct CPU *cpu_handle)
     cpu_handle->X = 0;
     cpu_handle->Y = 0;
     init_psr(&cpu_handle->P);
+	init_cpumem(&cpu_handle->memory, buffer);
 }
 
 void destroy_cpu(struct CPU *cpu_handle)
@@ -608,17 +610,17 @@ bool cpu_step(struct CPU *cpu_handle)
 
 void cpu_push(struct CPU *cpu_handle, byte_t data)
 {
-    cpu_handle->memory.RAM[0x100 + cpu_handle->sp++];
+    cpu_handle->memory.ram[0x100 + cpu_handle->sp++];
 }
 
 byte_t cpu_pop(struct CPU *cpu_handle)
 {
-    return cpu_handle->memory.RAM[0x100 + --cpu_handle->sp];
+    return cpu_handle->memory.ram[0x100 + --cpu_handle->sp];
 }
 
 byte_t cpu_peek(struct CPU *cpu_handle)
 {
-    return cpu_handle->memory.RAM[0x100 + cpu_handle->sp - 1];
+    return cpu_handle->memory.ram[0x100 + cpu_handle->sp - 1];
 }
 
 void cpu_imm(struct CPU *cpu_handle, byte_t **arg)
@@ -674,7 +676,7 @@ void cpu_zpixy(struct CPU *cpu_handle, byte_t **arg)
 void cpu_idr(struct CPU *cpu_handle, byte_t **arg)
 {
     *arg =  cpumem_readbp(&cpu_handle->memory,
-            cpumem_reads(&cpu_handle->memory, cpu_handle->sp));
+            cpumem_reads(&cpu_handle->memory, cpu_handle->pc));
     cpu_handle->sp += 2;
 }
 
@@ -682,19 +684,19 @@ void cpu_preii(struct CPU *cpu_handle, byte_t **arg)
 {
     *arg =  cpumem_readbp(&cpu_handle->memory,
             cpumem_reads(&cpu_handle->memory, cpu_handle->X +
-            *cpumem_readbp(&cpu_handle->memory, cpu_handle->sp++)));
+            *cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++)));
 }
 
 void cpu_posii(struct CPU *cpu_handle, byte_t **arg)
 {
     *arg =  cpumem_readbp(&cpu_handle->memory, cpu_handle->Y +
             cpumem_reads(&cpu_handle->memory,
-            *cpumem_readbp(&cpu_handle->memory, cpu_handle->sp++)));
+            *cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++)));
 }
 
 void cpu_rel(struct CPU *cpu_handle, byte_t **arg)
 {
-    *arg = cpumem_readbp(&cpu_handle->memory, cpu_handle->sp++);
+    *arg = cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++);
 }
 
 void cpu_adc(struct CPU *cpu_handle, byte_t arg)
@@ -923,20 +925,20 @@ void cpu_iny(struct CPU *cpu_handle)
 
 void cpu_jmp(struct CPU *cpu_handle, byte_t *arg)
 {
-    if(arg >= cpu_handle->memory.PRG_low && arg < cpu_handle->memory.PRG_low + 0x4000)
-        cpu_handle->pc = 0x8000 + arg - cpu_handle->memory.PRG_low;
-    else if(arg >= cpu_handle->memory.PRG_high && arg < cpu_handle->memory.PRG_high + 0x4000)
-        cpu_handle->pc = 0xC000 + arg - cpu_handle->memory.PRG_high;
-    else if(arg >= cpu_handle->memory.SRAM && arg < cpu_handle->memory.SRAM + 0x2000)
-        cpu_handle->pc = 0x6000 + arg - cpu_handle->memory.SRAM;
-    else if(arg >= cpu_handle->memory.EROM && arg < cpu_handle->memory.EROM + 0x1FE0)
-        cpu_handle->pc = 0x4020 + arg - cpu_handle->memory.EROM;
-    else if(arg >= cpu_handle->memory.RAM && arg < cpu_handle->memory.RAM + 0x2000)
-        cpu_handle->pc = arg - cpu_handle->memory.RAM;
-    else if(arg >= cpu_handle->memory.PPU_IO && arg < cpu_handle->memory.PPU_IO + 0x08)
-        cpu_handle->pc = 0x2000 + arg - cpu_handle->memory.PPU_IO;
-    else if(arg >= cpu_handle->memory.APU_IO && arg < cpu_handle->memory.APU_IO + 0x20)
-        cpu_handle->pc = 0x4000 + arg - cpu_handle->memory.APU_IO;
+    if(arg >= cpu_handle->memory.prg_low && arg < cpu_handle->memory.prg_low + 0x4000)
+        cpu_handle->pc = 0x8000 + arg - cpu_handle->memory.prg_low;
+    else if(arg >= cpu_handle->memory.prg_high && arg < cpu_handle->memory.prg_high + 0x4000)
+        cpu_handle->pc = 0xC000 + arg - cpu_handle->memory.prg_high;
+    else if(arg >= cpu_handle->memory.sram && arg < cpu_handle->memory.sram + 0x2000)
+        cpu_handle->pc = 0x6000 + arg - cpu_handle->memory.sram;
+    else if(arg >= cpu_handle->memory.erom && arg < cpu_handle->memory.erom + 0x1FE0)
+        cpu_handle->pc = 0x4020 + arg - cpu_handle->memory.erom;
+    else if(arg >= cpu_handle->memory.ram && arg < cpu_handle->memory.ram + 0x2000)
+        cpu_handle->pc = arg - cpu_handle->memory.ram;
+    else if(arg >= cpu_handle->memory.ppu_io && arg < cpu_handle->memory.ppu_io + 0x08)
+        cpu_handle->pc = 0x2000 + arg - cpu_handle->memory.ppu_io;
+    else if(arg >= cpu_handle->memory.apu_io && arg < cpu_handle->memory.apu_io + 0x20)
+        cpu_handle->pc = 0x4000 + arg - cpu_handle->memory.apu_io;
 }
 
 void cpu_jsr(struct CPU *cpu_handle, byte_t *arg)

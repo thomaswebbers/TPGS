@@ -13,9 +13,9 @@
 struct ROM
 {
     byte_t num_prg;     //amount of PRG-ROM banks
-    byte_t **prg;       //PRG-ROM banks
+    byte_t *prg;       //PRG-ROM banks
     byte_t num_chr;     //amount of CHR-ROM banks
-    byte_t **chr;       //CHR-ROM banks
+    byte_t *chr;       //CHR-ROM banks
     byte_t *sram;       //Save RAM
     byte_t mapper;      //mapper type
     byte_t mirror;      //mirroring mode

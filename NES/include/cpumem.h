@@ -23,20 +23,30 @@ struct CPUmem
      * 0xC000  - PRG-ROM (Lower Bank)
      * 0x10000 - PRG-ROM (Upper Bank)
      */
-    byte_t RAM[0x800];
-    byte_t PPU_IO[0x08];
-    byte_t APU_IO[0x20];
-    byte_t EROM[0x1FE0];
+
+    byte_t ram[0x800];
+    byte_t ppu_io[0x08];
+    byte_t apu_io[0x20];
+    byte_t erom[0x1FE0];
 
     /*
      * the mmc handles which part of the rom is currently loaded. The banks
      * change at runtime, so the prg and sram arrays change as well.
      */
 
-    byte_t *SRAM;
-    byte_t *PRG_low;
-    byte_t *PRG_high;
+    byte_t *sram;
+    byte_t *prg_low;
+    byte_t *prg_high;
+
+    /*
+     * To keep bank switching seperate of the cpu, the calls to the mmc are
+     * buffered inside mmc memory. The cpu has a pointer to this buffer.
+     */
+
+     struct MMCbuf *buffer_mmc;
 };
+
+void init_cpumem(struct CPUmem *cpumem_handle, struct MMCbuf *buffer);
 
 /*
  * Reads a byte from the cpu memory.
