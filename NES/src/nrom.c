@@ -1,9 +1,9 @@
-#include "mmc.h"
+#include "nes.h"
 #include "nrom.h"
 
-void init_nrom(struct MMC *mmc_handle)
+void init_nrom(struct NES *nes)
 {
-    mmc_handle->cpu_mem->prg_low = mmc_handle->rom.prg;
-    mmc_handle->cpu_mem->prg_high = mmc_handle->rom.prg
-        + (mmc_handle->rom.num_prg - 1) * PRG_ROM_BANK_SIZE;
+    nes->cpu.memory.prg_low = nes->mmc.rom.prg;
+    nes->cpu.memory.prg_high = nes->mmc.rom.prg
+        + (nes->mmc.rom.num_prg - 1) * PRG_ROM_BANK_SIZE;
 }

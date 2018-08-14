@@ -1,34 +1,34 @@
-#include "psr.h"
+#include "nes.h"
 
-void init_psr(struct PSR *psr_handle)
+void init_psr(struct NES *nes)
 {
-    psr_handle->C = false;
-    psr_handle->Z = false;
-    psr_handle->I = false;
-    psr_handle->D = false;
-    psr_handle->B = false;
-    psr_handle->V = false;
-    psr_handle->S = false;
+    nes->cpu.P.C = false;
+    nes->cpu.P.Z = false;
+    nes->cpu.P.I = false;
+    nes->cpu.P.D = false;
+    nes->cpu.P.B = false;
+    nes->cpu.P.V = false;
+    nes->cpu.P.S = false;
 }
 
-byte_t psr_as_byte(struct PSR *psr_handle)
+byte_t psr_as_byte(struct NES *nes)
 {
-    return  (psr_handle->S << 7) |
-            (psr_handle->V << 6) |
-            (psr_handle->B << 4) |
-            (psr_handle->D << 3) |
-            (psr_handle->I << 2) |
-            (psr_handle->Z << 1) |
-            (psr_handle->C);
+    return  (nes->cpu.P.S << 7) |
+            (nes->cpu.P.V << 6) |
+            (nes->cpu.P.B << 4) |
+            (nes->cpu.P.D << 3) |
+            (nes->cpu.P.I << 2) |
+            (nes->cpu.P.Z << 1) |
+            (nes->cpu.P.C);
 }
 
-void byte_as_psr(struct PSR *psr_handle, byte_t flags)
+void byte_as_psr(struct NES *nes, byte_t flags)
 {
-    psr_handle->C = ((flags & 0x01) == 0x01);
-    psr_handle->Z = ((flags & 0x02) == 0x02);
-    psr_handle->I = ((flags & 0x04) == 0x04);
-    psr_handle->D = ((flags & 0x08) == 0x08);
-    psr_handle->B = ((flags & 0x10) == 0x10);
-    psr_handle->V = ((flags & 0x40) == 0x40);
-    psr_handle->S = ((flags & 0x80) == 0x80);
+    nes->cpu.P.C = ((flags & 0x01) == 0x01);
+    nes->cpu.P.Z = ((flags & 0x02) == 0x02);
+    nes->cpu.P.I = ((flags & 0x04) == 0x04);
+    nes->cpu.P.D = ((flags & 0x08) == 0x08);
+    nes->cpu.P.B = ((flags & 0x10) == 0x10);
+    nes->cpu.P.V = ((flags & 0x40) == 0x40);
+    nes->cpu.P.S = ((flags & 0x80) == 0x80);
 }

@@ -7,22 +7,9 @@
 #include "ppu.h"
 #include "mmc.h"
 
-
-
 #define INIT_SUCCES         ((uint32_t) 0x00)
 #define INIT_FAILURE        ((uint32_t) 0xFF)
 
-/*
-#define SET_NEGATIVE_FLAG(nes_handle, operand)
-    ((operand) > 0x7F
-        ? nes_handle->cpu.P = nes_handle->cpu.P | 0x80
-        : nes_handle->cpu.P = nes_handle->cpu.P & 0x7F)
-
-#define SET_ZERO_FLAG(nes_handle, operand)
-    (operand == 0
-        ? nes_handle->cpu.P = nes_handle->cpu.P | 0x02
-        : nes_handle->cpu.P = nes_handle->cpu.P & 0xFD)
-*/
 struct NES
 {
     uint32_t master_clock;
@@ -43,7 +30,7 @@ struct NES
 
  * @return flag for succes status
  */
-int init_nes(struct NES **nes_handle, char *binary_path);
+int init_nes(struct NES **nes, char *binary_path);
 
 /*
  * Steps through the rom to execute the game.
@@ -52,7 +39,7 @@ int init_nes(struct NES **nes_handle, char *binary_path);
  *
  * @return void
  */
-void run_nes(struct NES *nes_handle);
+void run_nes(struct NES *nes);
 
 /*
  * Handles the next opcode.
@@ -61,7 +48,7 @@ void run_nes(struct NES *nes_handle);
  *
  * @return false if end of program is reached
  */
-bool step_nes(struct NES *nes_handle);
+bool step_nes(struct NES *nes);
 
 /*
  * Deallocates the memory used by the nes.
@@ -70,6 +57,6 @@ bool step_nes(struct NES *nes_handle);
  *
  * @return void
  */
-void destroy_nes(struct NES *nes_handle);
+void destroy_nes(struct NES *nes);
 
 #endif

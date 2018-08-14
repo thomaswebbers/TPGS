@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rom.h"
+#include "nes.h"
 
 #define INES_HEADER_SIZE    ((byte_t) 0x10)
 #define NES_SIGNATURE       "NES\x1A"
@@ -33,7 +33,7 @@
  * 0x09 - 0x0E      -Reserved for future usage and should all be 0.
  */
 
-bool init_rom(struct ROM *rom_handle, char *binary_file)
+bool init_rom(struct NES *nes, char *binary_file)
 {
     FILE *fp;
     byte_t header[INES_HEADER_SIZE];
@@ -58,39 +58,39 @@ bool init_rom(struct ROM *rom_handle, char *binary_file)
     }
 
     //info on ines format found above
-    rom_handle->num_prg = header[0x04];
-    rom_handle->num_chr = header[0x05];
-    rom_handle->mirror = ((header[0x06] & 0x08) >> 0x02) | (header[0x06] & 0x01);
-    rom_handle->battery = (header[0x06] & 0x02) >> 0x01;
+    nes->mmc.rom.num_prg = header[0x04];
+    nes->mmc.rom.num_chr = header[0x05];
+    nes->mmc.rom.mirror = ((header[0x06] & 0x08) >> 0x02) | (header[0x06] & 0x01);
+    nes->mmc.rom.battery = (header[0x06] & 0x02) >> 0x01;
     byte_t trainer = (header[0x06] & 0x04) >> 0x02;     //UNUSED
-    rom_handle->mapper = (header[0x07] & 0xF0) | ((header[0x06] & 0xF0) >> 0x04);
+    nes->mmc.rom.mapper = (header[0x07] & 0xF0) | ((header[0x06] & 0xF0) >> 0x04);
     byte_t numRAM = header[0x08];
     if(numRAM == 0)
         numRAM = 1;
 
     //test :D
-    rom_handle->sram = malloc(sizeof(byte_t) * 0x2000);
+    nes->mmc.rom.sram = malloc(sizeof(byte_t) * 0x2000);
 
     //move past trainer data
     if(trainer == 1)
         fseek(fp, 0x200, SEEK_CUR);
 
     //allocate and read all banks for prg rom
-    rom_handle->prg = malloc(sizeof(byte_t *) * rom_handle->num_prg * PRG_ROM_BANK_SIZE);
-    fread(rom_handle->prg, sizeof(byte_t), PRG_ROM_BANK_SIZE * rom_handle->num_prg, fp);
+    nes->mmc.rom.prg = malloc(sizeof(byte_t *) * nes->mmc.rom.num_prg * PRG_ROM_BANK_SIZE);
+    fread(nes->mmc.rom.prg, sizeof(byte_t), PRG_ROM_BANK_SIZE * nes->mmc.rom.num_prg, fp);
 
     //allocate and read all banks for chr rom
-    rom_handle->chr = malloc(sizeof(byte_t *) * rom_handle->num_chr * CHR_ROM_BANK_SIZE);
-    fread(rom_handle->chr, sizeof(byte_t), CHR_ROM_BANK_SIZE * rom_handle->num_chr, fp);
+    nes->mmc.rom.chr = malloc(sizeof(byte_t *) * nes->mmc.rom.num_chr * CHR_ROM_BANK_SIZE);
+    fread(nes->mmc.rom.chr, sizeof(byte_t), CHR_ROM_BANK_SIZE * nes->mmc.rom.num_chr, fp);
 
 
 
-    printf("num_prg:\t%x\n", rom_handle->num_prg);
-    printf("num_chr:\t%x\n", rom_handle->num_chr);
-    printf("mirror:\t\t%x\n", rom_handle->mirror);
-    printf("battery:\t%x\n", rom_handle->battery);
+    printf("num_prg:\t%x\n", nes->mmc.rom.num_prg);
+    printf("num_chr:\t%x\n", nes->mmc.rom.num_chr);
+    printf("mirror:\t\t%x\n", nes->mmc.rom.mirror);
+    printf("battery:\t%x\n", nes->mmc.rom.battery);
     printf("trainer:\t%x\n", trainer);
-    printf("mapper:\t\t%x\n", rom_handle->mapper);
+    printf("mapper:\t\t%x\n", nes->mmc.rom.mapper);
     printf("numRAM:\t\t%x\tTODO :)\n", numRAM);
 
 
@@ -98,11 +98,11 @@ bool init_rom(struct ROM *rom_handle, char *binary_file)
     return true;
 }
 
-void destroy_rom(struct ROM *rom_handle)
+void destroy_rom(struct NES *nes)
 {
-    free(rom_handle->prg);
+    free(nes->mmc.rom.prg);
 
-    free(rom_handle->chr);
+    free(nes->mmc.rom.chr);
 
-    free(rom_handle->sram);
+    free(nes->mmc.rom.sram);
 }

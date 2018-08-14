@@ -8,39 +8,36 @@
 #include "ppu.h"
 #include "rom.h"
 
-int init_nes(struct NES **nes_handle, char *binary_file)
+int init_nes(struct NES **nes, char *binary_file)
 {
-    *nes_handle = malloc(sizeof(struct NES));
-    (**nes_handle).master_clock = 0;
-    init_mmc(   &(**nes_handle).mmc,
-                &(**nes_handle).cpu.memory,
-                &(**nes_handle).ppu.memory,
-                binary_file);
-    init_cpu(&(**nes_handle).cpu, &(**nes_handle).mmc.buffer);
-    init_ppu(&(**nes_handle).ppu);
+    *nes = malloc(sizeof(struct NES));
+    (**nes).master_clock = 0;
+    init_mmc(*nes, binary_file);
+    init_cpu(*nes);
+    init_ppu(*nes);
     return INIT_SUCCES;
 }
 
-void run_nes(struct NES *nes_handle)
+void run_nes(struct NES *nes)
 {
-    while(step_nes(nes_handle))
+    while(step_nes(nes))
     {
-        //sleep(1);
+        usleep(1000000);
     }
 }
 
-bool step_nes(struct NES *nes_handle)
+bool step_nes(struct NES *nes)
 {
-    nes_handle->master_clock++;
-    bool test = cpu_step(&(nes_handle->cpu));
-    step_mmc(&(nes_handle->mmc));
+    nes->master_clock++;
+    bool test = cpu_step(nes);
+    step_mmc(nes);
     return test;
 }
 
-void destroy_nes(struct NES *nes_handle)
+void destroy_nes(struct NES *nes)
 {
-    destroy_cpu(&nes_handle->cpu);
-    destroy_ppu(&nes_handle->ppu);
-    destroy_mmc(&nes_handle->mmc);
-    free(nes_handle);
+    destroy_cpu(nes);
+    destroy_ppu(nes);
+    destroy_mmc(nes);
+    free(nes);
 }

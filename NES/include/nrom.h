@@ -2,6 +2,8 @@
 #define NROM_H
 #include "mmc.h"
 
-void init_nrom(struct MMC *mmc_handle);
+struct NES;
+
+void init_nrom(struct NES *nes);
 
 #endif

@@ -1,52 +1,49 @@
 #include <stdio.h>
 
-#include "mmc.h"
-#include "mmcbuf.h"
+#include "nes.h"
+#include "nrom.h"
+#include "mmc1.h"
 
 #define NROM            ((byte_t) 0x00)
 #define MMC1            ((byte_t) 0x01)
 
-void init_mmc(struct MMC *mmc_handle, struct CPUmem *cpumem_handle, struct PPUmem *ppumem_handle, char *binary_file)
+void init_mmc(struct NES *nes, char *binary_file)
 {
-    mmc_handle->cpu_mem = cpumem_handle;
-    mmc_handle->ppu_mem = ppumem_handle;
-    init_rom(&mmc_handle->rom, binary_file);
-    mmc_handle->shift_register = 0;
-
-    mmc_handle->cpu_mem->sram = mmc_handle->rom.sram;
-    switch(mmc_handle->rom.mapper)
+    init_rom(nes, binary_file);
+    nes->mmc.shift_register = 0;
+    switch(nes->mmc.rom.mapper)
     {
         case NROM:
-            init_nrom(mmc_handle);
+            init_nrom(nes);
             break;
         case MMC1:
-            init_mmc1(mmc_handle);
+            init_mmc1(nes);
             break;
         default:
-            printf("Mapper not yet implemented: %x\n", mmc_handle->rom.mapper);
+            printf("Mapper not yet implemented: %x\n", nes->mmc.rom.mapper);
     }
 }
 
-void step_mmc(struct MMC *mmc_handle)
+void step_mmc(struct NES *nes)
 {
-    if(mmc_handle->buffer.address == 0x00)
+    if(nes->mmc.buffer.address == 0x00)
         return;
 
-    switch(mmc_handle->rom.mapper)
+    switch(nes->mmc.rom.mapper)
     {
         case NROM:
             fprintf(stderr, "Shouldn't write to rom if mapper == NROM\n");
             break;
         case MMC1:
-            step_mmc1(mmc_handle);
+            step_mmc1(nes);
             break;
         default:
-            fprintf(stderr, "Mapper not yet implemented: %x\n", mmc_handle->rom.mapper);
+            fprintf(stderr, "Mapper not yet implemented: %x\n", nes->mmc.rom.mapper);
     }
-    mmc_handle->buffer.address = 0x00;
+    nes->mmc.buffer.address = 0x00;
 }
 
-void destroy_mmc(struct MMC *mmc_handle)
+void destroy_mmc(struct NES *nes)
 {
-    destroy_rom(&mmc_handle->rom);
+    destroy_rom(nes);
 }

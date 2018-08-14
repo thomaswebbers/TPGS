@@ -5,6 +5,8 @@
 
 #include "opcodes.h"
 
+struct NES;
+
 
 #define PRG_ROM_BANK_SIZE       ((uint16_t) 0x4000) //16KB
 #define CHR_ROM_BANK_SIZE       ((uint16_t) 0x2000) //8KB
@@ -22,8 +24,8 @@ struct ROM
     byte_t battery;     //battery-backed ROM
 };
 
-bool init_rom(struct ROM *rom_handle, char *binary_path);
+bool init_rom(struct NES *nes, char *binary_path);
 
-void destroy_rom(struct ROM *rom_handle);
+void destroy_rom(struct NES *nes);
 
 #endif

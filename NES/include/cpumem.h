@@ -6,6 +6,8 @@
 #define RESET_VEC       ((uint16_t) 0xFFFC)
 #define IRQ_VEC         ((uint16_t) 0xFFFE)
 
+struct NES;
+
 struct CPUmem
 {
     /*
@@ -37,16 +39,9 @@ struct CPUmem
     byte_t *sram;
     byte_t *prg_low;
     byte_t *prg_high;
-
-    /*
-     * To keep bank switching seperate of the cpu, the calls to the mmc are
-     * buffered inside mmc memory. The cpu has a pointer to this buffer.
-     */
-
-     struct MMCbuf *buffer_mmc;
 };
 
-void init_cpumem(struct CPUmem *cpumem_handle, struct MMCbuf *buffer);
+void init_cpumem(struct NES *nes);
 
 /*
  * Reads a byte from the cpu memory.
@@ -56,7 +51,7 @@ void init_cpumem(struct CPUmem *cpumem_handle, struct MMCbuf *buffer);
  *
  * @return the byte at the specified address
  */
-byte_t *cpumem_readbp(struct CPUmem *cpumem_handle, uint16_t address);
+byte_t *cpumem_readbp(struct NES *nes, uint16_t address);
 
 /*
  * Writes a byte to the cpu memory.
@@ -67,7 +62,7 @@ byte_t *cpumem_readbp(struct CPUmem *cpumem_handle, uint16_t address);
  *
  * @return void
  */
-void cpumem_writeb(struct CPUmem *cpumem_handle, uint16_t address, byte_t data);
+void cpumem_writeb(struct NES *nes, uint16_t address, byte_t data);
 
 /*
  * Reads a byte from the cpu memory.
@@ -77,7 +72,7 @@ void cpumem_writeb(struct CPUmem *cpumem_handle, uint16_t address, byte_t data);
  *
  * @return the short at the specified address
  */
-uint16_t cpumem_reads(struct CPUmem *cpumem_handle, uint16_t address);
+uint16_t cpumem_reads(struct NES *nes, uint16_t address);
 
 /*
  * Writes a short to the cpu memory.
@@ -88,6 +83,6 @@ uint16_t cpumem_reads(struct CPUmem *cpumem_handle, uint16_t address);
  *
  * @return void
  */
-void cpumem_writes(struct CPUmem *cpumem_handle, uint16_t address, uint16_t data);
+void cpumem_writes(struct NES *nes, uint16_t address, uint16_t data);
 
 #endif

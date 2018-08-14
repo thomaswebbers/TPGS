@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include "opcodes.h"
 
+struct NES;
+
 /*
  * Processor Status
  * =================
@@ -28,7 +30,7 @@ struct PSR
     bool S;   //Negative (Sign)
 };
 
-void init_psr(struct PSR *psr_handle);
+void init_psr(struct NES *nes);
 
 /*
  * Returns the Processor Status Register P as a byte with the same structure as
@@ -38,8 +40,8 @@ void init_psr(struct PSR *psr_handle);
  *
  * @return Processor Status Register P as byte
  */
-byte_t psr_as_byte(struct PSR *psr_handle);
+byte_t psr_as_byte(struct NES *nes);
 
-void byte_as_psr(struct PSR *psr_handle, byte_t flags);
+void byte_as_psr(struct NES *nes, byte_t flags);
 
 #endif

@@ -62,35 +62,35 @@ char op_names[256][4] = {
 	"SED", "SBC", "NOP", "ISC", "NOP", "SBC", "INC", "ISC",
 };
 
-void init_cpu(struct CPU *cpu_handle, struct MMCbuf *buffer)
+void init_cpu(struct NES *nes)
 {
-    cpu_handle->clock = 0;
-    cpu_handle->pc = cpumem_reads(&cpu_handle->memory, RESET_VEC);
-    cpu_handle->sp = 0;
-    cpu_handle->A = 0;
-    cpu_handle->X = 0;
-    cpu_handle->Y = 0;
-    init_psr(&cpu_handle->P);
-	init_cpumem(&cpu_handle->memory, buffer);
+    nes->cpu.clock = 0;
+    nes->cpu.pc = cpumem_reads(nes, RESET_VEC);
+    nes->cpu.sp = 0;
+    nes->cpu.A = 0;
+    nes->cpu.X = 0;
+    nes->cpu.Y = 0;
+    init_psr(nes);
+	init_cpumem(nes);
 }
 
-void destroy_cpu(struct CPU *cpu_handle)
+void destroy_cpu(struct NES *nes)
 {
 
 }
 
-void cpu_add_cycles(struct CPU *cpu_handle, uint32_t cycles)
+void cpu_add_cycles(struct NES *nes, uint32_t cycles)
 {
-    cpu_handle->clock += cycles;
+    nes->cpu.clock += cycles;
 }
 
-bool cpu_step(struct CPU *cpu_handle)
+bool cpu_step(struct NES *nes)
 {
-    byte_t opcode = *cpumem_readbp(&cpu_handle->memory, cpu_handle->pc);
-    printf("opcode[%x]: %x ", cpu_handle->pc, opcode);
+    byte_t opcode = *cpumem_readbp(nes, nes->cpu.pc);
+    printf("opcode[%x]: %x ", nes->cpu.pc, opcode);
     byte_t *arg;
-    cpu_handle->pc++;
-    cpu_handle->clock += opcode_cycles[opcode];
+    nes->cpu.pc++;
+    nes->cpu.clock += opcode_cycles[opcode];
     switch(opcode)
     {
         /***********************************************
@@ -101,7 +101,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_LDA: case IMM_LDX: case IMM_LDY:
         case IMM_ORA: case IMM_SBC:
 			printf("IMM_");
-            cpu_imm(cpu_handle, &arg);
+            cpu_imm(nes, &arg);
             break;
 
         /***********************************************
@@ -115,7 +115,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case ZP_ROL: case ZP_ROR: case ZP_SBC:
         case ZP_STA: case ZP_STX: case ZP_STY:
 			printf("ZP_");
-            cpu_zp(cpu_handle, &arg);
+            cpu_zp(nes, &arg);
             break;
 
         /***********************************************
@@ -130,7 +130,7 @@ bool cpu_step(struct CPU *cpu_handle)
 		case ABS_ROR: case ABS_SBC: case ABS_STA:
 		case ABS_STX: case ABS_STY:
 			printf("ABS_");
-            cpu_abs(cpu_handle, &arg);
+            cpu_abs(nes, &arg);
             break;
 
         /***********************************************
@@ -154,7 +154,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case ACC_ASL: case ACC_LSR: case ACC_ROL:
         case ACC_ROR:
 			printf("ACC_");
-            cpu_acc(cpu_handle, &arg);
+            cpu_acc(nes, &arg);
             break;
 
         /***********************************************
@@ -166,7 +166,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IXX_LSR: case IXX_ORA: case IXX_ROL:
         case IXX_ROR: case IXX_SBC: case IXX_STA:
 			printf("IXX_");
-            cpu_ixx(cpu_handle, &arg);
+            cpu_ixx(nes, &arg);
             break;
 
         /***********************************************
@@ -176,7 +176,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IXY_EOR: case IXY_LDA: case IXY_LDX:
         case IXY_ORA: case IXY_SBC: case IXY_STA:
 			printf("IXY_");
-            cpu_ixy(cpu_handle, &arg);
+            cpu_ixy(nes, &arg);
             break;
 
         /***********************************************
@@ -189,7 +189,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case ZPIXX_ROR: case ZPIXX_SBC: case ZPIXX_STA:
         case ZPIXX_STY:
 			printf("ZPIXX_");
-            cpu_zpixx(cpu_handle, &arg);
+            cpu_zpixx(nes, &arg);
             break;
 
         /***********************************************
@@ -197,7 +197,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZPIXY_LDX: case ZPIXY_STX:
 			printf("ZPIXY_");
-            cpu_zpixy(cpu_handle, &arg);
+            cpu_zpixy(nes, &arg);
             break;
 
         /***********************************************
@@ -205,7 +205,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case IDR_JMP:
 			printf("IDR_");
-            cpu_idr(cpu_handle, &arg);
+            cpu_idr(nes, &arg);
             break;
 
         /***********************************************
@@ -215,7 +215,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case PREII_EOR: case PREII_LDA: case PREII_ORA:
         case PREII_SBC: case PREII_STA:
 			printf("PREII_");
-            cpu_preii(cpu_handle, &arg);
+            cpu_preii(nes, &arg);
             break;
 
         /***********************************************
@@ -225,7 +225,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case POSII_EOR: case POSII_LDA: case POSII_ORA:
         case POSII_SBC: case POSII_STA:
 			printf("POSII_");
-            cpu_posii(cpu_handle, &arg);
+            cpu_posii(nes, &arg);
             break;
 
         /***********************************************
@@ -235,7 +235,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case REL_BMI: case REL_BNE: case REL_BPL:
         case REL_BVC: case REL_BVS:
 			printf("REL_");
-            cpu_rel(cpu_handle, &arg);
+            cpu_rel(nes, &arg);
             break;
 
         default:
@@ -251,7 +251,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_ADC:   case ZP_ADC:    case ABS_ADC:
         case IXX_ADC:   case IXY_ADC:   case ZPIXX_ADC:
         case PREII_ADC: case POSII_ADC:
-            cpu_adc(cpu_handle, *arg);
+            cpu_adc(nes, *arg);
             break;
 
         /***********************************************
@@ -260,7 +260,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_AND:   case ZP_AND:    case ABS_AND:
         case IXX_AND:   case IXY_AND:   case ZPIXX_AND:
         case PREII_AND: case POSII_AND:
-            cpu_and(cpu_handle, *arg);
+            cpu_and(nes, *arg);
             break;
 
         /***********************************************
@@ -268,105 +268,105 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZP_ASL:    case ABS_ASL:   case ACC_ASL:
         case IXX_ASL:
-            cpu_asl(cpu_handle, arg);
+            cpu_asl(nes, arg);
             break;
 
         /***********************************************
         *************Branch on Carry Clear**************
         ***********************************************/
         case REL_BCC:
-            cpu_bcc(cpu_handle, *arg);
+            cpu_bcc(nes, *arg);
             break;
 
         /***********************************************
         **************Branch on Carry Set***************
         ***********************************************/
         case REL_BCS:
-            cpu_bcs(cpu_handle, *arg);
+            cpu_bcs(nes, *arg);
             break;
 
         /***********************************************
         *************Branch on Result Zero**************
         ***********************************************/
         case REL_BEQ:
-            cpu_beq(cpu_handle, *arg);
+            cpu_beq(nes, *arg);
             break;
 
         /***********************************************
         *************Test Bits in M with A**************
         ***********************************************/
         case ZP_BIT:    case ABS_BIT:
-            cpu_bit(cpu_handle, *arg);
+            cpu_bit(nes, *arg);
             break;
 
         /***********************************************
         *************Branch on Result Minus*************
         ***********************************************/
         case REL_BMI:
-            cpu_bmi(cpu_handle, *arg);
+            cpu_bmi(nes, *arg);
             break;
 
         /***********************************************
         ***********Branch on Result not Zero************
         ***********************************************/
         case REL_BNE:
-            cpu_bne(cpu_handle, *arg);
+            cpu_bne(nes, *arg);
             break;
 
         /***********************************************
         *************Branch on Result Plus**************
         ***********************************************/
         case REL_BPL:
-            cpu_bpl(cpu_handle, *arg);
+            cpu_bpl(nes, *arg);
             break;
 
         /***********************************************
         ******************Force Break*******************
         ***********************************************/
         case IMP_BRK:
-            cpu_brk(cpu_handle);
+            cpu_brk(nes);
             break;
 
         /***********************************************
         ************Branch on Overflow Clear************
         ***********************************************/
         case REL_BVC:
-            cpu_bvc(cpu_handle, *arg);
+            cpu_bvc(nes, *arg);
             break;
 
         /***********************************************
         *************Branch on Overflow Set*************
         ***********************************************/
         case REL_BVS:
-            cpu_bvs(cpu_handle, *arg);
+            cpu_bvs(nes, *arg);
             break;
 
         /***********************************************
         ****************Clear Carry Flag****************
         ***********************************************/
         case IMP_CLC:
-            cpu_clc(cpu_handle);
+            cpu_clc(nes);
             break;
 
         /***********************************************
         ***************Clear Decimal Mode***************
         ***********************************************/
         case IMP_CLD:
-            cpu_cld(cpu_handle);
+            cpu_cld(nes);
             break;
 
         /***********************************************
         **********Clear interrupt Disable Bit***********
         ***********************************************/
         case IMP_CLI:
-            cpu_cli(cpu_handle);
+            cpu_cli(nes);
             break;
 
         /***********************************************
         **************Clear Overflow Flag***************
         ***********************************************/
         case IMP_CLV:
-            cpu_clv(cpu_handle);
+            cpu_clv(nes);
             break;
 
         /***********************************************
@@ -375,21 +375,21 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_CMP:   case ZP_CMP:    case ABS_CMP:
         case IXX_CMP:   case IXY_CMP:   case ZPIXX_CMP:
         case PREII_CMP: case POSII_CMP:
-            cpu_cmp(cpu_handle, *arg);
+            cpu_cmp(nes, *arg);
             break;
 
         /***********************************************
         ****************Compare M and X*****************
         ***********************************************/
         case IMM_CPX:   case ZP_CPX:    case ABS_CPX:
-            cpu_cpx(cpu_handle, *arg);
+            cpu_cpx(nes, *arg);
             break;
 
         /***********************************************
         ****************Compare M and Y*****************
         ***********************************************/
         case IMM_CPY:   case ZP_CPY:    case ABS_CPY:
-            cpu_cpy(cpu_handle, *arg);
+            cpu_cpy(nes, *arg);
             break;
 
         /***********************************************
@@ -397,21 +397,21 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZP_DEC:    case ABS_DEC:   case IXX_DEC:
         case ZPIXX_DEC:
-            cpu_dec(cpu_handle, arg);
+            cpu_dec(nes, arg);
             break;
 
         /***********************************************
         ***************Decrement X by One***************
         ***********************************************/
         case IMP_DEX:
-            cpu_dex(cpu_handle);
+            cpu_dex(nes);
             break;
 
         /***********************************************
         ***************Decrement Y by One***************
         ***********************************************/
         case IMP_DEY:
-            cpu_dey(cpu_handle);
+            cpu_dey(nes);
             break;
 
         /***********************************************
@@ -420,7 +420,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_EOR:   case ZP_EOR:    case ABS_EOR:
         case IXX_EOR:   case IXY_EOR:   case ZPIXX_EOR:
         case PREII_EOR: case POSII_EOR:
-            cpu_eor(cpu_handle, *arg);
+            cpu_eor(nes, *arg);
             break;
 
         /***********************************************
@@ -428,35 +428,35 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZP_INC:    case ABS_INC:   case IXX_INC:
         case ZPIXX_INC:
-            cpu_inc(cpu_handle, arg);
+            cpu_inc(nes, arg);
             break;
 
         /***********************************************
         ***************Increment X by One***************
         ***********************************************/
         case IMP_INX:
-            cpu_inx(cpu_handle);
+            cpu_inx(nes);
             break;
 
         /***********************************************
         ***************Increment Y by One***************
         ***********************************************/
         case IMP_INY:
-            cpu_iny(cpu_handle);
+            cpu_iny(nes);
             break;
 
         /***********************************************
         ****************Jump to Location****************
         ***********************************************/
         case ABS_JMP:  case IDR_JMP:
-            cpu_jmp(cpu_handle, arg);
+            cpu_jmp(nes, arg);
             break;
 
         /***********************************************
         ******Jump to Location Save Return Address******
         ***********************************************/
         case ABS_JSR:
-            cpu_jsr(cpu_handle, arg);
+            cpu_jsr(nes, arg);
             break;
 
         /***********************************************
@@ -465,7 +465,7 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_LDA:   case ZP_LDA:    case ABS_LDA:
         case IXX_LDA:   case IXY_LDA:   case ZPIXX_LDA:
         case PREII_LDA: case POSII_LDA:
-			cpu_lda(cpu_handle, *arg);
+			cpu_lda(nes, *arg);
             break;
 
         /***********************************************
@@ -473,7 +473,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case IMM_LDX:   case ZP_LDX:    case ABS_LDX:
         case IXY_LDX:   case ZPIXY_LDX:
-			cpu_ldx(cpu_handle, *arg);
+			cpu_ldx(nes, *arg);
             break;
 
         /***********************************************
@@ -481,7 +481,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case IMM_LDY:   case ZP_LDY:    case ABS_LDY:
         case IXX_LDY:   case ZPIXX_LDY:
-			cpu_ldy(cpu_handle, *arg);
+			cpu_ldy(nes, *arg);
             break;
 
         /***********************************************
@@ -489,7 +489,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZP_LSR:    case ABS_LSR:   case ACC_LSR:
         case IXX_LSR:   case ZPIXX_LSR:
-			cpu_lsr(cpu_handle, arg);
+			cpu_lsr(nes, arg);
             break;
 
         /***********************************************
@@ -504,35 +504,35 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_ORA:   case ZP_ORA:    case ABS_ORA:
         case IXX_ORA:   case IXY_ORA:   case ZPIXX_ORA:
         case PREII_ORA: case POSII_ORA:
-			cpu_ora(cpu_handle, *arg);
+			cpu_ora(nes, *arg);
             break;
 
         /***********************************************
         ****************Push A on Stack*****************
         ***********************************************/
         case IMP_PHA:
-			cpu_pha(cpu_handle);
+			cpu_pha(nes);
             break;
 
         /***********************************************
         *********Push Processor Status on Stack*********
         ***********************************************/
         case IMP_PHP:
-			cpu_php(cpu_handle);
+			cpu_php(nes);
             break;
 
         /***********************************************
         ***************Pull A from Stack****************
         ***********************************************/
         case IMP_PLA:
-			cpu_pla(cpu_handle);
+			cpu_pla(nes);
             break;
 
         /***********************************************
         ********Pull Processor Status from Stack********
         ***********************************************/
         case IMP_PLP:
-			cpu_plp(cpu_handle);
+			cpu_plp(nes);
             break;
 
         /***********************************************
@@ -540,7 +540,7 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZP_ROL:    case ABS_ROL:   case ACC_ROL:
         case IXX_ROL:   case ZPIXX_ROL:
-			cpu_rol(cpu_handle, arg);
+			cpu_rol(nes, arg);
             break;
 
         /***********************************************
@@ -548,21 +548,21 @@ bool cpu_step(struct CPU *cpu_handle)
         ***********************************************/
         case ZP_ROR:    case ABS_ROR:   case ACC_ROR:
         case IXX_ROR:   case ZPIXX_ROR:
-			cpu_ror(cpu_handle, arg);
+			cpu_ror(nes, arg);
             break;
 
         /***********************************************
         *************Return from Interrupt**************
         ***********************************************/
         case IMP_RTI:
-			cpu_rti(cpu_handle);
+			cpu_rti(nes);
             break;
 
         /***********************************************
         *************Return from Subroutine*************
         ***********************************************/
         case IMP_RTS:
-			cpu_rts(cpu_handle);
+			cpu_rts(nes);
             break;
 
         /***********************************************
@@ -571,28 +571,28 @@ bool cpu_step(struct CPU *cpu_handle)
         case IMM_SBC:   case ZP_SBC:    case ABS_SBC:
         case IXX_SBC:   case IXY_SBC:   case ZPIXX_SBC:
         case PREII_SBC: case POSII_SBC:
-			cpu_sbc(cpu_handle, *arg);
+			cpu_sbc(nes, *arg);
             break;
 
         /***********************************************
         *****************Set Carry Flag*****************
         ***********************************************/
         case IMP_SEC:
-			cpu_sec(cpu_handle);
+			cpu_sec(nes);
             break;
 
         /***********************************************
         ****************Set Decimal Mode****************
         ***********************************************/
         case IMP_SED:
-			cpu_sed(cpu_handle);
+			cpu_sed(nes);
             break;
 
         /***********************************************
         **********Set Interrupt Disable Status**********
         ***********************************************/
         case IMP_SEI:
-			cpu_sei(cpu_handle);
+			cpu_sei(nes);
             break;
 
         /***********************************************
@@ -601,568 +601,568 @@ bool cpu_step(struct CPU *cpu_handle)
         case ZP_STA:    case ABS_STA:   case IXX_STA:
         case IXY_STA:   case ZPIXX_STA: case PREII_STA:
         case POSII_STA:
-			cpu_sta(cpu_handle, arg);
+			cpu_sta(nes, arg);
             break;
 
         /***********************************************
         ******************Store X in M******************
         ***********************************************/
         case ZP_STX:    case ABS_STX:   case ZPIXY_STX:
-			cpu_stx(cpu_handle, arg);
+			cpu_stx(nes, arg);
             break;
 
         /***********************************************
         ******************Store Y in M******************
         ***********************************************/
         case ZP_STY:    case ABS_STY:   case ZPIXX_STY:
-			cpu_sty(cpu_handle, arg);
+			cpu_sty(nes, arg);
             break;
 
         /***********************************************
         *****************Transfer A to X****************
         ***********************************************/
         case IMP_TAX:
-			cpu_tax(cpu_handle);
+			cpu_tax(nes);
             break;
 
         /***********************************************
         **********Transfer Stack Pointer to X***********
         ***********************************************/
         case IMP_TSX:
-			cpu_tsx(cpu_handle);
+			cpu_tsx(nes);
             break;
 
         /***********************************************
         *****************Transfer X to A****************
         ***********************************************/
         case IMP_TXA:
-			cpu_txa(cpu_handle);
+			cpu_txa(nes);
             break;
 
         /***********************************************
         **********Transfer X to Stack Pointer***********
         ***********************************************/
         case IMP_TXS:
-			cpu_txs(cpu_handle);
+			cpu_txs(nes);
             break;
 
         /***********************************************
         *****************Transfer Y to A****************
         ***********************************************/
         case IMP_TYA:
-			cpu_tya(cpu_handle);
+			cpu_tya(nes);
             break;
     }
     return true;
 }
 
-void cpu_push(struct CPU *cpu_handle, byte_t data)
+void cpu_push(struct NES *nes, byte_t data)
 {
-    cpu_handle->memory.ram[0x100 + cpu_handle->sp++];
+    nes->cpu.memory.ram[0x100 + nes->cpu.sp++];
 }
 
-byte_t cpu_pop(struct CPU *cpu_handle)
+byte_t cpu_pop(struct NES *nes)
 {
-    return cpu_handle->memory.ram[0x100 + --cpu_handle->sp];
+    return nes->cpu.memory.ram[0x100 + --nes->cpu.sp];
 }
 
-byte_t cpu_peek(struct CPU *cpu_handle)
+byte_t cpu_peek(struct NES *nes)
 {
-    return cpu_handle->memory.ram[0x100 + cpu_handle->sp - 1];
+    return nes->cpu.memory.ram[0x100 + nes->cpu.sp - 1];
 }
 
-void cpu_imm(struct CPU *cpu_handle, byte_t **arg)
+void cpu_imm(struct NES *nes, byte_t **arg)
 {
-    *arg = cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++);
+    *arg = cpumem_readbp(nes, nes->cpu.pc++);
 }
 
-void cpu_zp(struct CPU *cpu_handle, byte_t **arg)
+void cpu_zp(struct NES *nes, byte_t **arg)
 {
-    *arg =  cpumem_readbp(&cpu_handle->memory,
-            *cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++));
+    *arg =  cpumem_readbp(nes,
+            *cpumem_readbp(nes, nes->cpu.pc++));
 }
 
-void cpu_abs(struct CPU *cpu_handle, byte_t **arg)
+void cpu_abs(struct NES *nes, byte_t **arg)
 {
-    *arg =  cpumem_readbp(&cpu_handle->memory,
-            cpumem_reads(&cpu_handle->memory, cpu_handle->pc));
-    cpu_handle->pc += 2;
+    *arg =  cpumem_readbp(nes,
+            cpumem_reads(nes, nes->cpu.pc));
+    nes->cpu.pc += 2;
 }
 
-void cpu_acc(struct CPU *cpu_handle, byte_t **arg)
+void cpu_acc(struct NES *nes, byte_t **arg)
 {
-    *arg = &cpu_handle->A;
-    cpu_handle->pc;
+    *arg = &nes->cpu.A;
+    nes->cpu.pc;
 }
 
-void cpu_ixx(struct CPU *cpu_handle, byte_t **arg)
+void cpu_ixx(struct NES *nes, byte_t **arg)
 {
-    *arg =  cpumem_readbp(&cpu_handle->memory, cpu_handle->X +
-            cpumem_reads(&cpu_handle->memory, cpu_handle->pc));
-    cpu_handle->pc += 2;
+    *arg =  cpumem_readbp(nes, nes->cpu.X +
+            cpumem_reads(nes, nes->cpu.pc));
+    nes->cpu.pc += 2;
 }
 
-void cpu_ixy(struct CPU *cpu_handle, byte_t **arg)
+void cpu_ixy(struct NES *nes, byte_t **arg)
 {
-    *arg =  cpumem_readbp(&cpu_handle->memory, cpu_handle->Y +
-            cpumem_reads(&cpu_handle->memory, cpu_handle->pc));
-    cpu_handle += 2;
+    *arg =  cpumem_readbp(nes, nes->cpu.Y +
+            cpumem_reads(nes, nes->cpu.pc));
+    nes->cpu.pc += 2;
 }
 
-void cpu_zpixx(struct CPU *cpu_handle, byte_t **arg)
+void cpu_zpixx(struct NES *nes, byte_t **arg)
 {
-    *arg =  cpumem_readbp(&cpu_handle->memory, cpu_handle->X +
-            *cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++));
+    *arg =  cpumem_readbp(nes, nes->cpu.X +
+            *cpumem_readbp(nes, nes->cpu.pc++));
 }
 
-void cpu_zpixy(struct CPU *cpu_handle, byte_t **arg)
+void cpu_zpixy(struct NES *nes, byte_t **arg)
 {
-    *arg =  cpumem_readbp(&cpu_handle->memory, cpu_handle->Y +
-            *cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++));
+    *arg =  cpumem_readbp(nes, nes->cpu.Y +
+            *cpumem_readbp(nes, nes->cpu.pc++));
 }
 
-void cpu_idr(struct CPU *cpu_handle, byte_t **arg)
+void cpu_idr(struct NES *nes, byte_t **arg)
 {
-    *arg =  cpumem_readbp(&cpu_handle->memory,
-            cpumem_reads(&cpu_handle->memory, cpu_handle->pc));
-    cpu_handle->sp += 2;
+    *arg =  cpumem_readbp(nes,
+            cpumem_reads(nes, nes->cpu.pc));
+    nes->cpu.sp += 2;
 }
 
-void cpu_preii(struct CPU *cpu_handle, byte_t **arg)
+void cpu_preii(struct NES *nes, byte_t **arg)
 {
-    *arg =  cpumem_readbp(&cpu_handle->memory,
-            cpumem_reads(&cpu_handle->memory, cpu_handle->X +
-            *cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++)));
+    *arg =  cpumem_readbp(nes,
+            cpumem_reads(nes, nes->cpu.X +
+            *cpumem_readbp(nes, nes->cpu.pc++)));
 }
 
-void cpu_posii(struct CPU *cpu_handle, byte_t **arg)
+void cpu_posii(struct NES *nes, byte_t **arg)
 {
-    *arg =  cpumem_readbp(&cpu_handle->memory, cpu_handle->Y +
-            cpumem_reads(&cpu_handle->memory,
-            *cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++)));
+    *arg =  cpumem_readbp(nes, nes->cpu.Y +
+            cpumem_reads(nes,
+            *cpumem_readbp(nes, nes->cpu.pc++)));
 }
 
-void cpu_rel(struct CPU *cpu_handle, byte_t **arg)
+void cpu_rel(struct NES *nes, byte_t **arg)
 {
-    *arg = cpumem_readbp(&cpu_handle->memory, cpu_handle->pc++);
+    *arg = cpumem_readbp(nes, nes->cpu.pc++);
 }
 
-void cpu_adc(struct CPU *cpu_handle, byte_t arg)
+void cpu_adc(struct NES *nes, byte_t arg)
 {
-    uint16_t temp = arg + cpu_handle->A + cpu_handle->P.C;
-    cpu_handle->P.V =   !((cpu_handle->A ^ arg) & 0x80)
-                        && ((cpu_handle->A ^ temp) & 0x80);
-    cpu_handle->A = (byte_t) temp;
-    cpu_handle->P.Z = (cpu_handle->A == 0);
-    cpu_handle->P.S = (cpu_handle->A > 0x7F);
-    cpu_handle->P.C = (temp > 0xff);
+    uint16_t temp = arg + nes->cpu.A + nes->cpu.P.C;
+    nes->cpu.P.V =   !((nes->cpu.A ^ arg) & 0x80)
+                        && ((nes->cpu.A ^ temp) & 0x80);
+    nes->cpu.A = (byte_t) temp;
+    nes->cpu.P.Z = (nes->cpu.A == 0);
+    nes->cpu.P.S = (nes->cpu.A > 0x7F);
+    nes->cpu.P.C = (temp > 0xff);
 }
 
-void cpu_and(struct CPU *cpu_handle, byte_t arg)
+void cpu_and(struct NES *nes, byte_t arg)
 {
-    cpu_handle->A &= arg;
-    cpu_handle->P.Z = (cpu_handle->A == 0);
-    cpu_handle->P.S = (cpu_handle->A > 0x7F);
+    nes->cpu.A &= arg;
+    nes->cpu.P.Z = (nes->cpu.A == 0);
+    nes->cpu.P.S = (nes->cpu.A > 0x7F);
 }
 
-void cpu_asl(struct CPU *cpu_handle, byte_t *arg)
+void cpu_asl(struct NES *nes, byte_t *arg)
 {
-    cpu_handle->P.C = (*arg > 0x7F);
+    nes->cpu.P.C = (*arg > 0x7F);
     *arg <<= 1;
-    cpu_handle->P.Z = (*arg == 0);
-    cpu_handle->P.S = (*arg > 0x7F);
+    nes->cpu.P.Z = (*arg == 0);
+    nes->cpu.P.S = (*arg > 0x7F);
 }
 
-void cpu_bcc(struct CPU *cpu_handle, int8_t offset)
+void cpu_bcc(struct NES *nes, int8_t offset)
 {
-    if(!cpu_handle->P.C)
+    if(!nes->cpu.P.C)
     {
-        cpu_handle->clock +=    ((cpu_handle->pc & 0xFF00)
-                                != ((cpu_handle->pc + offset) & 0xFF00)
+        nes->cpu.clock +=    ((nes->cpu.pc & 0xFF00)
+                                != ((nes->cpu.pc + offset) & 0xFF00)
                                 ? 2 : 1);
-        cpu_handle->pc += offset;
+        nes->cpu.pc += offset;
     }
 }
 
-void cpu_bcs(struct CPU *cpu_handle, int8_t offset)
+void cpu_bcs(struct NES *nes, int8_t offset)
 {
-    if(!cpu_handle->P.C)
+    if(!nes->cpu.P.C)
     {
-        cpu_handle->clock +=    ((cpu_handle->pc & 0xFF00)
-                                != ((cpu_handle->pc + offset) & 0xFF00)
+        nes->cpu.clock +=    ((nes->cpu.pc & 0xFF00)
+                                != ((nes->cpu.pc + offset) & 0xFF00)
                                 ? 2 : 1);
-        cpu_handle->pc += offset;
+        nes->cpu.pc += offset;
     }
 }
 
-void cpu_beq(struct CPU *cpu_handle, int8_t offset)
+void cpu_beq(struct NES *nes, int8_t offset)
 {
-    if(cpu_handle->P.Z)
+    if(nes->cpu.P.Z)
     {
-        cpu_handle->clock +=    ((cpu_handle->pc & 0xFF00)
-                                != ((cpu_handle->pc + offset) & 0xFF00)
+        nes->cpu.clock +=    ((nes->cpu.pc & 0xFF00)
+                                != ((nes->cpu.pc + offset) & 0xFF00)
                                 ? 2 : 1);
-        cpu_handle->pc += offset;
+        nes->cpu.pc += offset;
     }
 }
 
-void cpu_bit(struct CPU *cpu_handle, byte_t arg)
+void cpu_bit(struct NES *nes, byte_t arg)
 {
-    cpu_handle->P.S = (arg > 0x7F);
-    cpu_handle->P.V = ((arg & 0x40) > 0x3F);
-    cpu_handle->P.Z = ((arg & cpu_handle->A) == 0);
+    nes->cpu.P.S = (arg > 0x7F);
+    nes->cpu.P.V = ((arg & 0x40) > 0x3F);
+    nes->cpu.P.Z = ((arg & nes->cpu.A) == 0);
 }
 
-void cpu_bmi(struct CPU *cpu_handle, int8_t offset)
+void cpu_bmi(struct NES *nes, int8_t offset)
 {
-    if(cpu_handle->P.S)
+    if(nes->cpu.P.S)
     {
-        cpu_handle->clock +=    ((cpu_handle->pc & 0xFF00)
-                                != ((cpu_handle->pc + offset) & 0xFF00)
+        nes->cpu.clock +=    ((nes->cpu.pc & 0xFF00)
+                                != ((nes->cpu.pc + offset) & 0xFF00)
                                 ? 2 : 1);
-        cpu_handle->pc += offset;
+        nes->cpu.pc += offset;
     }
 }
 
-void cpu_bne(struct CPU *cpu_handle, int8_t offset)
+void cpu_bne(struct NES *nes, int8_t offset)
 {
-    if(!cpu_handle->P.Z)
+    if(!nes->cpu.P.Z)
     {
-        cpu_handle->clock +=    ((cpu_handle->pc & 0xFF00)
-                                != ((cpu_handle->pc + offset) & 0xFF00)
+        nes->cpu.clock +=    ((nes->cpu.pc & 0xFF00)
+                                != ((nes->cpu.pc + offset) & 0xFF00)
                                 ? 2 : 1);
-        cpu_handle->pc += offset;
+        nes->cpu.pc += offset;
     }
 }
 
-void cpu_bpl(struct CPU *cpu_handle, int8_t offset)
+void cpu_bpl(struct NES *nes, int8_t offset)
 {
-    if(!cpu_handle->P.S)
+    if(!nes->cpu.P.S)
     {
-        cpu_handle->clock +=    ((cpu_handle->pc & 0xFF00)
-                                != ((cpu_handle->pc + offset) & 0xFF00)
+        nes->cpu.clock +=    ((nes->cpu.pc & 0xFF00)
+                                != ((nes->cpu.pc + offset) & 0xFF00)
                                 ? 2 : 1);
-        cpu_handle->pc += offset;
+        nes->cpu.pc += offset;
     }
 }
 
-void cpu_brk(struct CPU *cpu_handle)
+void cpu_brk(struct NES *nes)
 {
-    cpu_push(cpu_handle, cpu_handle->pc >> 8);
-    cpu_push(cpu_handle, cpu_handle->pc);
-    cpu_handle->P.B = true;
-    cpu_push(cpu_handle, psr_as_byte(&cpu_handle->P));
-    cpu_handle->P.I = true;
-    cpu_handle->pc = cpumem_reads(&cpu_handle->memory, IRQ_VEC);
+    cpu_push(nes, nes->cpu.pc >> 8);
+    cpu_push(nes, nes->cpu.pc);
+    nes->cpu.P.B = true;
+    cpu_push(nes, psr_as_byte(nes));
+    nes->cpu.P.I = true;
+    nes->cpu.pc = cpumem_reads(nes, IRQ_VEC);
 }
 
-void cpu_bvc(struct CPU *cpu_handle, int8_t offset)
+void cpu_bvc(struct NES *nes, int8_t offset)
 {
-    if(!cpu_handle->P.V)
+    if(!nes->cpu.P.V)
     {
-        cpu_handle->clock +=    ((cpu_handle->pc & 0xFF00)
-                                != ((cpu_handle->pc + offset) & 0xFF00)
+        nes->cpu.clock +=    ((nes->cpu.pc & 0xFF00)
+                                != ((nes->cpu.pc + offset) & 0xFF00)
                                 ? 2 : 1);
-        cpu_handle->pc += offset;
+        nes->cpu.pc += offset;
     }
 }
 
-void cpu_bvs(struct CPU *cpu_handle, int8_t offset)
+void cpu_bvs(struct NES *nes, int8_t offset)
 {
-    if(cpu_handle->P.V)
+    if(nes->cpu.P.V)
     {
-        cpu_handle->clock +=    ((cpu_handle->pc & 0xFF00)
-                                != ((cpu_handle->pc + offset) & 0xFF00)
+        nes->cpu.clock +=    ((nes->cpu.pc & 0xFF00)
+                                != ((nes->cpu.pc + offset) & 0xFF00)
                                 ? 2 : 1);
-        cpu_handle->pc += offset;
+        nes->cpu.pc += offset;
     }
 }
 
-void cpu_clc(struct CPU *cpu_handle)
+void cpu_clc(struct NES *nes)
 {
-    cpu_handle->P.C = false;
+    nes->cpu.P.C = false;
 }
 
-void cpu_cld(struct CPU *cpu_handle)
+void cpu_cld(struct NES *nes)
 {
-    cpu_handle->P.D = false;
+    nes->cpu.P.D = false;
 }
 
-void cpu_cli(struct CPU *cpu_handle)
+void cpu_cli(struct NES *nes)
 {
-    cpu_handle->P.I = false;
+    nes->cpu.P.I = false;
 }
 
-void cpu_clv(struct CPU *cpu_handle)
+void cpu_clv(struct NES *nes)
 {
-    cpu_handle->P.V = false;
+    nes->cpu.P.V = false;
 }
 
-void cpu_cmp(struct CPU *cpu_handle, byte_t arg)
+void cpu_cmp(struct NES *nes, byte_t arg)
 {
-    uint16_t temp = cpu_handle->A - arg;
-    cpu_handle->P.C = (temp > 0xFF);
-    cpu_handle->P.S = ((temp & 0xFF) > 0x7F);
-    cpu_handle->P.Z = (temp == 0);
+    uint16_t temp = nes->cpu.A - arg;
+    nes->cpu.P.C = (temp > 0xFF);
+    nes->cpu.P.S = ((temp & 0xFF) > 0x7F);
+    nes->cpu.P.Z = (temp == 0);
 }
 
-void cpu_cpx(struct CPU *cpu_handle, byte_t arg)
+void cpu_cpx(struct NES *nes, byte_t arg)
 {
-    uint16_t temp = cpu_handle->X - arg;
-    cpu_handle->P.C = (temp > 0xFF);
-    cpu_handle->P.S = ((temp & 0xFF) > 0x7F);
-    cpu_handle->P.Z = (temp == 0);
+    uint16_t temp = nes->cpu.X - arg;
+    nes->cpu.P.C = (temp > 0xFF);
+    nes->cpu.P.S = ((temp & 0xFF) > 0x7F);
+    nes->cpu.P.Z = (temp == 0);
 }
 
-void cpu_cpy(struct CPU *cpu_handle, byte_t arg)
+void cpu_cpy(struct NES *nes, byte_t arg)
 {
-    uint16_t temp = cpu_handle->Y - arg;
-    cpu_handle->P.C = (temp > 0xFF);
-    cpu_handle->P.S = ((temp & 0xFF) > 0x7F);
-    cpu_handle->P.Z = (temp == 0);
+    uint16_t temp = nes->cpu.Y - arg;
+    nes->cpu.P.C = (temp > 0xFF);
+    nes->cpu.P.S = ((temp & 0xFF) > 0x7F);
+    nes->cpu.P.Z = (temp == 0);
 }
 
-void cpu_dec(struct CPU *cpu_handle, byte_t *arg)
+void cpu_dec(struct NES *nes, byte_t *arg)
 {
     *arg--;
-    cpu_handle->P.S = (*arg > 0x7F);
-    cpu_handle->P.Z = (*arg == 0);
+    nes->cpu.P.S = (*arg > 0x7F);
+    nes->cpu.P.Z = (*arg == 0);
 }
 
-void cpu_dex(struct CPU *cpu_handle)
+void cpu_dex(struct NES *nes)
 {
-    cpu_handle->X--;
-    cpu_handle->P.S = (cpu_handle->X > 0x7F);
-    cpu_handle->P.Z = (cpu_handle->X == 0);
+    nes->cpu.X--;
+    nes->cpu.P.S = (nes->cpu.X > 0x7F);
+    nes->cpu.P.Z = (nes->cpu.X == 0);
 }
 
-void cpu_dey(struct CPU *cpu_handle)
+void cpu_dey(struct NES *nes)
 {
-    cpu_handle->Y--;
-    cpu_handle->P.S = (cpu_handle->Y > 0x7F);
-    cpu_handle->P.Z = (cpu_handle->Y == 0);
+    nes->cpu.Y--;
+    nes->cpu.P.S = (nes->cpu.Y > 0x7F);
+    nes->cpu.P.Z = (nes->cpu.Y == 0);
 }
 
-void cpu_eor(struct CPU *cpu_handle, byte_t arg)
+void cpu_eor(struct NES *nes, byte_t arg)
 {
-    cpu_handle->A ^= arg;
-    cpu_handle->P.S = (cpu_handle->Y > 0x7F);
-    cpu_handle->P.Z = (cpu_handle->Y == 0);
+    nes->cpu.A ^= arg;
+    nes->cpu.P.S = (nes->cpu.Y > 0x7F);
+    nes->cpu.P.Z = (nes->cpu.Y == 0);
 }
 
-void cpu_inc(struct CPU *cpu_handle, byte_t *arg)
+void cpu_inc(struct NES *nes, byte_t *arg)
 {
     *arg++;
-    cpu_handle->P.S = (*arg > 0x7F);
-    cpu_handle->P.Z = (*arg == 0);
+    nes->cpu.P.S = (*arg > 0x7F);
+    nes->cpu.P.Z = (*arg == 0);
 }
 
-void cpu_inx(struct CPU *cpu_handle)
+void cpu_inx(struct NES *nes)
 {
-    cpu_handle->X++;
-    cpu_handle->P.S = (cpu_handle->X > 0x7F);
-    cpu_handle->P.Z = (cpu_handle->X == 0);
+    nes->cpu.X++;
+    nes->cpu.P.S = (nes->cpu.X > 0x7F);
+    nes->cpu.P.Z = (nes->cpu.X == 0);
 }
 
-void cpu_iny(struct CPU *cpu_handle)
+void cpu_iny(struct NES *nes)
 {
-    cpu_handle->Y++;
-    cpu_handle->P.S = (cpu_handle->Y > 0x7F);
-    cpu_handle->P.Z = (cpu_handle->Y == 0);
+    nes->cpu.Y++;
+    nes->cpu.P.S = (nes->cpu.Y > 0x7F);
+    nes->cpu.P.Z = (nes->cpu.Y == 0);
 }
 
-void cpu_jmp(struct CPU *cpu_handle, byte_t *arg)
+void cpu_jmp(struct NES *nes, byte_t *arg)
 {
-    if(arg >= cpu_handle->memory.prg_low && arg < cpu_handle->memory.prg_low + 0x4000)
-        cpu_handle->pc = 0x8000 + arg - cpu_handle->memory.prg_low;
-    else if(arg >= cpu_handle->memory.prg_high && arg < cpu_handle->memory.prg_high + 0x4000)
-        cpu_handle->pc = 0xC000 + arg - cpu_handle->memory.prg_high;
-    else if(arg >= cpu_handle->memory.sram && arg < cpu_handle->memory.sram + 0x2000)
-        cpu_handle->pc = 0x6000 + arg - cpu_handle->memory.sram;
-    else if(arg >= cpu_handle->memory.erom && arg < cpu_handle->memory.erom + 0x1FE0)
-        cpu_handle->pc = 0x4020 + arg - cpu_handle->memory.erom;
-    else if(arg >= cpu_handle->memory.ram && arg < cpu_handle->memory.ram + 0x2000)
-        cpu_handle->pc = arg - cpu_handle->memory.ram;
-    else if(arg >= cpu_handle->memory.ppu_io && arg < cpu_handle->memory.ppu_io + 0x08)
-        cpu_handle->pc = 0x2000 + arg - cpu_handle->memory.ppu_io;
-    else if(arg >= cpu_handle->memory.apu_io && arg < cpu_handle->memory.apu_io + 0x20)
-        cpu_handle->pc = 0x4000 + arg - cpu_handle->memory.apu_io;
+    if(arg >= nes->cpu.memory.prg_low && arg < nes->cpu.memory.prg_low + 0x4000)
+        nes->cpu.pc = 0x8000 + arg - nes->cpu.memory.prg_low;
+    else if(arg >= nes->cpu.memory.prg_high && arg < nes->cpu.memory.prg_high + 0x4000)
+        nes->cpu.pc = 0xC000 + arg - nes->cpu.memory.prg_high;
+    else if(arg >= nes->cpu.memory.sram && arg < nes->cpu.memory.sram + 0x2000)
+        nes->cpu.pc = 0x6000 + arg - nes->cpu.memory.sram;
+    else if(arg >= nes->cpu.memory.erom && arg < nes->cpu.memory.erom + 0x1FE0)
+        nes->cpu.pc = 0x4020 + arg - nes->cpu.memory.erom;
+    else if(arg >= nes->cpu.memory.ram && arg < nes->cpu.memory.ram + 0x2000)
+        nes->cpu.pc = arg - nes->cpu.memory.ram;
+    else if(arg >= nes->cpu.memory.ppu_io && arg < nes->cpu.memory.ppu_io + 0x08)
+        nes->cpu.pc = 0x2000 + arg - nes->cpu.memory.ppu_io;
+    else if(arg >= nes->cpu.memory.apu_io && arg < nes->cpu.memory.apu_io + 0x20)
+        nes->cpu.pc = 0x4000 + arg - nes->cpu.memory.apu_io;
 }
 
-void cpu_jsr(struct CPU *cpu_handle, byte_t *arg)
+void cpu_jsr(struct NES *nes, byte_t *arg)
 {
-    cpu_push(cpu_handle, (byte_t) (cpu_handle->pc >> 8));
-    cpu_push(cpu_handle, (byte_t) cpu_handle->pc);
-    cpu_jmp(cpu_handle, arg);
+    cpu_push(nes, (byte_t) (nes->cpu.pc >> 8));
+    cpu_push(nes, (byte_t) nes->cpu.pc);
+    cpu_jmp(nes, arg);
 }
 
-void cpu_lda(struct CPU *cpu_handle, byte_t arg)
+void cpu_lda(struct NES *nes, byte_t arg)
 {
-    cpu_handle->P.S = (arg > 0x7F);
-    cpu_handle->P.Z = (arg == 0);
-    cpu_handle->A = arg;
+    nes->cpu.P.S = (arg > 0x7F);
+    nes->cpu.P.Z = (arg == 0);
+    nes->cpu.A = arg;
 }
 
-void cpu_ldx(struct CPU *cpu_handle, byte_t arg)
+void cpu_ldx(struct NES *nes, byte_t arg)
 {
-    cpu_handle->P.S = (arg > 0x7F);
-    cpu_handle->P.Z = (arg == 0);
-    cpu_handle->X = arg;
+    nes->cpu.P.S = (arg > 0x7F);
+    nes->cpu.P.Z = (arg == 0);
+    nes->cpu.X = arg;
 }
 
-void cpu_ldy(struct CPU *cpu_handle, byte_t arg)
+void cpu_ldy(struct NES *nes, byte_t arg)
 {
-    cpu_handle->P.S = (arg > 0x7F);
-    cpu_handle->P.Z = (arg == 0);
-    cpu_handle->Y = arg;
+    nes->cpu.P.S = (arg > 0x7F);
+    nes->cpu.P.Z = (arg == 0);
+    nes->cpu.Y = arg;
 }
 
-void cpu_lsr(struct CPU *cpu_handle, byte_t *arg)
+void cpu_lsr(struct NES *nes, byte_t *arg)
 {
-    cpu_handle->P.C = ((*arg & 0x01) == 0x01);
+    nes->cpu.P.C = ((*arg & 0x01) == 0x01);
     *arg >= 1;
-    cpu_handle->P.S = false;
-    cpu_handle->P.Z = (arg == 0);
+    nes->cpu.P.S = false;
+    nes->cpu.P.Z = (arg == 0);
 }
 
-void cpu_ora(struct CPU *cpu_handle, byte_t arg)
+void cpu_ora(struct NES *nes, byte_t arg)
 {
-    cpu_handle->A |= arg;
-    cpu_handle->P.S = (cpu_handle->A > 0x7F);
-    cpu_handle->P.Z = (cpu_handle->A == 0);
+    nes->cpu.A |= arg;
+    nes->cpu.P.S = (nes->cpu.A > 0x7F);
+    nes->cpu.P.Z = (nes->cpu.A == 0);
 }
 
-void cpu_pha(struct CPU *cpu_handle)
+void cpu_pha(struct NES *nes)
 {
-    cpu_push(cpu_handle, cpu_handle->A);
+    cpu_push(nes, nes->cpu.A);
 }
 
-void cpu_php(struct CPU *cpu_handle)
+void cpu_php(struct NES *nes)
 {
-    cpu_push(cpu_handle, psr_as_byte(&cpu_handle->P));
+    cpu_push(nes, psr_as_byte(nes));
 }
 
-void cpu_pla(struct CPU *cpu_handle)
+void cpu_pla(struct NES *nes)
 {
-    cpu_handle->A = cpu_pop(cpu_handle);
+    nes->cpu.A = cpu_pop(nes);
 }
 
-void cpu_plp(struct CPU *cpu_handle)
+void cpu_plp(struct NES *nes)
 {
-    byte_as_psr(&cpu_handle->P, cpu_pop(cpu_handle));
+    byte_as_psr(nes, cpu_pop(nes));
 }
 
-void cpu_rol(struct CPU *cpu_handle, byte_t *arg)
+void cpu_rol(struct NES *nes, byte_t *arg)
 {
 	bool carry = ((*arg & 0x80) == 0x80);
 	*arg <<= 1;
-	*arg |= cpu_handle->P.C;
-	cpu_handle->P.C = carry;
-	cpu_handle->P.S = (*arg > 0x7F);
-    cpu_handle->P.Z = (*arg == 0);
+	*arg |= nes->cpu.P.C;
+	nes->cpu.P.C = carry;
+	nes->cpu.P.S = (*arg > 0x7F);
+    nes->cpu.P.Z = (*arg == 0);
 }
 
-void cpu_ror(struct CPU *cpu_handle, byte_t *arg)
+void cpu_ror(struct NES *nes, byte_t *arg)
 {
 	bool carry = ((*arg & 0x01) == 0x01);
 	*arg >>= 1;
-	*arg |= (cpu_handle->P.C << 7);
-	cpu_handle->P.C = carry;
-	cpu_handle->P.S = (*arg > 0x7F);
-    cpu_handle->P.Z = (*arg == 0);
+	*arg |= (nes->cpu.P.C << 7);
+	nes->cpu.P.C = carry;
+	nes->cpu.P.S = (*arg > 0x7F);
+    nes->cpu.P.Z = (*arg == 0);
 }
 
-void cpu_rti(struct CPU *cpu_handle)
+void cpu_rti(struct NES *nes)
 {
-	byte_as_psr(&cpu_handle->P, cpu_pop(cpu_handle));
-	byte_t low = cpu_pop(cpu_handle);
-	cpu_handle->pc = (cpu_pop(cpu_handle) << 8) | low;
+	byte_as_psr(nes, cpu_pop(nes));
+	byte_t low = cpu_pop(nes);
+	nes->cpu.pc = (cpu_pop(nes) << 8) | low;
 }
 
-void cpu_rts(struct CPU *cpu_handle)
+void cpu_rts(struct NES *nes)
 {
-	byte_t low = cpu_pop(cpu_handle);
-	cpu_handle->pc = (cpu_pop(cpu_handle) << 8) | low;
+	byte_t low = cpu_pop(nes);
+	nes->cpu.pc = (cpu_pop(nes) << 8) | low;
 }
 
-void cpu_sbc(struct CPU *cpu_handle, byte_t arg)
+void cpu_sbc(struct NES *nes, byte_t arg)
 {
-	uint16_t temp = cpu_handle->A - arg - cpu_handle->P.C;
-	cpu_handle->P.V =   !((cpu_handle->A ^ arg) & 0x80)
-						&& ((cpu_handle->A ^ temp) & 0x80);
-    cpu_handle->A = (byte_t) temp;
-    cpu_handle->P.Z = (cpu_handle->A == 0);
-    cpu_handle->P.S = (cpu_handle->A > 0x7F);
-    cpu_handle->P.C = (temp > 0xff);
+	uint16_t temp = nes->cpu.A - arg - nes->cpu.P.C;
+	nes->cpu.P.V =   !((nes->cpu.A ^ arg) & 0x80)
+						&& ((nes->cpu.A ^ temp) & 0x80);
+    nes->cpu.A = (byte_t) temp;
+    nes->cpu.P.Z = (nes->cpu.A == 0);
+    nes->cpu.P.S = (nes->cpu.A > 0x7F);
+    nes->cpu.P.C = (temp > 0xff);
 
 }
 
-void cpu_sec(struct CPU *cpu_handle)
+void cpu_sec(struct NES *nes)
 {
-	cpu_handle->P.C = true;
+	nes->cpu.P.C = true;
 }
 
-void cpu_sed(struct CPU *cpu_handle)
+void cpu_sed(struct NES *nes)
 {
-	cpu_handle->P.D = true;
+	nes->cpu.P.D = true;
 }
 
-void cpu_sei(struct CPU *cpu_handle)
+void cpu_sei(struct NES *nes)
 {
-    cpu_handle->P.I = true;
+    nes->cpu.P.I = true;
 }
 
-void cpu_sta(struct CPU *cpu_handle, byte_t *arg)
+void cpu_sta(struct NES *nes, byte_t *arg)
 {
-	*arg = cpu_handle->A;
+	*arg = nes->cpu.A;
 }
 
-void cpu_stx(struct CPU *cpu_handle, byte_t *arg)
+void cpu_stx(struct NES *nes, byte_t *arg)
 {
-	*arg = cpu_handle->X;
+	*arg = nes->cpu.X;
 }
 
-void cpu_sty(struct CPU *cpu_handle, byte_t *arg)
+void cpu_sty(struct NES *nes, byte_t *arg)
 {
-	*arg = cpu_handle->Y;
+	*arg = nes->cpu.Y;
 }
 
-void cpu_tax(struct CPU *cpu_handle)
+void cpu_tax(struct NES *nes)
 {
-	cpu_handle->X = cpu_handle->A;
-	cpu_handle->P.Z = (cpu_handle->X == 0);
-    cpu_handle->P.S = (cpu_handle->X > 0x7F);
+	nes->cpu.X = nes->cpu.A;
+	nes->cpu.P.Z = (nes->cpu.X == 0);
+    nes->cpu.P.S = (nes->cpu.X > 0x7F);
 }
 
-void cpu_tay(struct CPU *cpu_handle)
+void cpu_tay(struct NES *nes)
 {
-	cpu_handle->Y = cpu_handle->A;
-	cpu_handle->P.Z = (cpu_handle->Y == 0);
-    cpu_handle->P.S = (cpu_handle->Y > 0x7F);
+	nes->cpu.Y = nes->cpu.A;
+	nes->cpu.P.Z = (nes->cpu.Y == 0);
+    nes->cpu.P.S = (nes->cpu.Y > 0x7F);
 }
 
-void cpu_tsx(struct CPU *cpu_handle)
+void cpu_tsx(struct NES *nes)
 {
-	cpu_handle->X = cpu_handle->sp;
-	cpu_handle->P.Z = (cpu_handle->X == 0);
-    cpu_handle->P.S = (cpu_handle->X > 0x7F);
+	nes->cpu.X = nes->cpu.sp;
+	nes->cpu.P.Z = (nes->cpu.X == 0);
+    nes->cpu.P.S = (nes->cpu.X > 0x7F);
 }
 
-void cpu_txa(struct CPU *cpu_handle)
+void cpu_txa(struct NES *nes)
 {
-	cpu_handle->A = cpu_handle->X;
-	cpu_handle->P.Z = (cpu_handle->A == 0);
-	cpu_handle->P.S = (cpu_handle->A > 0x7F);
+	nes->cpu.A = nes->cpu.X;
+	nes->cpu.P.Z = (nes->cpu.A == 0);
+	nes->cpu.P.S = (nes->cpu.A > 0x7F);
 }
 
-void cpu_txs(struct CPU *cpu_handle)
+void cpu_txs(struct NES *nes)
 {
-	cpu_handle->sp = cpu_handle->X;
+	nes->cpu.sp = nes->cpu.X;
 }
 
-void cpu_tya(struct CPU *cpu_handle)
+void cpu_tya(struct NES *nes)
 {
-	cpu_handle->A = cpu_handle->Y;
-	cpu_handle->P.Z = (cpu_handle->A == 0);
-	cpu_handle->P.S = (cpu_handle->A > 0x7F);
+	nes->cpu.A = nes->cpu.Y;
+	nes->cpu.P.Z = (nes->cpu.A == 0);
+	nes->cpu.P.S = (nes->cpu.A > 0x7F);
 }

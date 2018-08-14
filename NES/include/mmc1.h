@@ -2,8 +2,10 @@
 #define MMC1_H
 #include "mmc.h"
 
-void init_mmc1(struct MMC *mmc_handle);
+struct NES;
 
-void step_mmc1(struct MMC *mmc_handle);
+void init_mmc1(struct NES *nes);
+
+void step_mmc1(struct NES *nes);
 
 #endif
