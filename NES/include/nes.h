@@ -30,7 +30,7 @@ struct NES
 
  * @return flag for succes status
  */
-int init_nes(struct NES **nes, char *binary_path);
+int init_nes(struct NES **nes, char *binary_file);
 
 /*
  * Steps through the rom to execute the game.

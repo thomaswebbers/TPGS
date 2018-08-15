@@ -22,7 +22,7 @@ void run_nes(struct NES *nes)
 {
     while(step_nes(nes))
     {
-        usleep(1000000);
+        usleep(10000);
     }
 }
 

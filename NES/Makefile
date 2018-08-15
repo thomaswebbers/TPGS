@@ -8,12 +8,13 @@ CC=gcc
 CFLAGS=-I$(IDIR)
 
 DEPS = $(wildcard $(IDIR)/*.h)
-SRCS = $(wildcard $(SDIR)/*.c)
+SRCS := $(wildcard $(SDIR)/*.c)
+SRCS := $(filter-out src/nes.c, $(SRCS))
 OBJ = $(patsubst $(SDIR)/%,$(ODIR)/%,$(SRCS:.c=.o))
 
 $(ODIR)/%.o: $(SDIR)/%.c
 	+@[ -d $(ODIR) ] || mkdir -p $(ODIR)
-	$(CC) -MMD $(CFLAGS) -c -o $@ $<
+	$(CC) $(addprefix -D, $(DEFS)) -MMD $(CFLAGS) -c -o $@ $<
 
 tnes: $(OBJ) $(ODIR)/main.o
 	$(CC) -o $@ $^ $(CFLAGS)

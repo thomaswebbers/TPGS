@@ -11,8 +11,6 @@ struct NES;
 struct MMC
 {
     struct ROM rom;
-    struct CPUmem *cpu_mem;
-    struct PPUmem *ppu_mem;
     struct MMCbuf buffer;
     byte_t shift_register;
 };

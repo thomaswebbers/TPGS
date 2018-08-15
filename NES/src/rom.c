@@ -83,17 +83,6 @@ bool init_rom(struct NES *nes, char *binary_file)
     nes->mmc.rom.chr = malloc(sizeof(byte_t *) * nes->mmc.rom.num_chr * CHR_ROM_BANK_SIZE);
     fread(nes->mmc.rom.chr, sizeof(byte_t), CHR_ROM_BANK_SIZE * nes->mmc.rom.num_chr, fp);
 
-
-
-    printf("num_prg:\t%x\n", nes->mmc.rom.num_prg);
-    printf("num_chr:\t%x\n", nes->mmc.rom.num_chr);
-    printf("mirror:\t\t%x\n", nes->mmc.rom.mirror);
-    printf("battery:\t%x\n", nes->mmc.rom.battery);
-    printf("trainer:\t%x\n", trainer);
-    printf("mapper:\t\t%x\n", nes->mmc.rom.mapper);
-    printf("numRAM:\t\t%x\tTODO :)\n", numRAM);
-
-
     fclose(fp);
     return true;
 }

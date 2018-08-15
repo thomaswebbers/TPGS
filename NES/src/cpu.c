@@ -1,11 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
+
 #include "nes.h"
-#include "opcodes.h"
-#include "cpu.h"
-#include "cpumem.h"
-#include "psr.h"
-#include "mmcbuf.h"
 
 const byte_t opcode_cycles[256] =
 {
@@ -87,7 +83,6 @@ void cpu_add_cycles(struct NES *nes, uint32_t cycles)
 bool cpu_step(struct NES *nes)
 {
     byte_t opcode = *cpumem_readbp(nes, nes->cpu.pc);
-    printf("opcode[%x]: %x ", nes->cpu.pc, opcode);
     byte_t *arg;
     nes->cpu.pc++;
     nes->cpu.clock += opcode_cycles[opcode];
@@ -100,7 +95,6 @@ bool cpu_step(struct NES *nes)
         case IMM_CPX: case IMM_CPY: case IMM_EOR:
         case IMM_LDA: case IMM_LDX: case IMM_LDY:
         case IMM_ORA: case IMM_SBC:
-			printf("IMM_");
             cpu_imm(nes, &arg);
             break;
 
@@ -114,7 +108,6 @@ bool cpu_step(struct NES *nes)
         case ZP_LDY: case ZP_LSR: case ZP_ORA:
         case ZP_ROL: case ZP_ROR: case ZP_SBC:
         case ZP_STA: case ZP_STX: case ZP_STY:
-			printf("ZP_");
             cpu_zp(nes, &arg);
             break;
 
@@ -129,7 +122,6 @@ bool cpu_step(struct NES *nes)
 		case ABS_LSR: case ABS_ORA: case ABS_ROL:
 		case ABS_ROR: case ABS_SBC: case ABS_STA:
 		case ABS_STX: case ABS_STY:
-			printf("ABS_");
             cpu_abs(nes, &arg);
             break;
 
@@ -145,7 +137,6 @@ bool cpu_step(struct NES *nes)
         case IMP_SEI: case IMP_TAX: case IMP_TAY:
         case IMP_TSX: case IMP_TXA: case IMP_TXS:
         case IMP_TYA:
-			printf("IMP_");
             break;
 
         /***********************************************
@@ -153,7 +144,6 @@ bool cpu_step(struct NES *nes)
         ***********************************************/
         case ACC_ASL: case ACC_LSR: case ACC_ROL:
         case ACC_ROR:
-			printf("ACC_");
             cpu_acc(nes, &arg);
             break;
 
@@ -165,7 +155,6 @@ bool cpu_step(struct NES *nes)
         case IXX_INC: case IXX_LDA: case IXX_LDY:
         case IXX_LSR: case IXX_ORA: case IXX_ROL:
         case IXX_ROR: case IXX_SBC: case IXX_STA:
-			printf("IXX_");
             cpu_ixx(nes, &arg);
             break;
 
@@ -175,7 +164,6 @@ bool cpu_step(struct NES *nes)
         case IXY_ADC: case IXY_AND: case IXY_CMP:
         case IXY_EOR: case IXY_LDA: case IXY_LDX:
         case IXY_ORA: case IXY_SBC: case IXY_STA:
-			printf("IXY_");
             cpu_ixy(nes, &arg);
             break;
 
@@ -188,7 +176,6 @@ bool cpu_step(struct NES *nes)
         case ZPIXX_LSR: case ZPIXX_ORA: case ZPIXX_ROL:
         case ZPIXX_ROR: case ZPIXX_SBC: case ZPIXX_STA:
         case ZPIXX_STY:
-			printf("ZPIXX_");
             cpu_zpixx(nes, &arg);
             break;
 
@@ -196,7 +183,6 @@ bool cpu_step(struct NES *nes)
         *Zero-Page Indexed Addressing(index register Y)*
         ***********************************************/
         case ZPIXY_LDX: case ZPIXY_STX:
-			printf("ZPIXY_");
             cpu_zpixy(nes, &arg);
             break;
 
@@ -204,7 +190,6 @@ bool cpu_step(struct NES *nes)
         **************Indirect Addressing***************
         ***********************************************/
         case IDR_JMP:
-			printf("IDR_");
             cpu_idr(nes, &arg);
             break;
 
@@ -214,7 +199,6 @@ bool cpu_step(struct NES *nes)
         case PREII_ADC: case PREII_AND: case PREII_CMP:
         case PREII_EOR: case PREII_LDA: case PREII_ORA:
         case PREII_SBC: case PREII_STA:
-			printf("PREII_");
             cpu_preii(nes, &arg);
             break;
 
@@ -224,7 +208,6 @@ bool cpu_step(struct NES *nes)
         case POSII_ADC: case POSII_AND: case POSII_CMP:
         case POSII_EOR: case POSII_LDA: case POSII_ORA:
         case POSII_SBC: case POSII_STA:
-			printf("POSII_");
             cpu_posii(nes, &arg);
             break;
 
@@ -234,7 +217,6 @@ bool cpu_step(struct NES *nes)
         case REL_BCC: case REL_BCS: case REL_BEQ:
         case REL_BMI: case REL_BNE: case REL_BPL:
         case REL_BVC: case REL_BVS:
-			printf("REL_");
             cpu_rel(nes, &arg);
             break;
 
@@ -242,7 +224,6 @@ bool cpu_step(struct NES *nes)
             fprintf(stderr, "DEFAULT: %x\n", opcode);
             return false;
     }
-	printf("%c%c%c\n", op_names[opcode][0], op_names[opcode][1], op_names[opcode][2]);
     switch(opcode)
     {
         /***********************************************
@@ -692,7 +673,6 @@ void cpu_abs(struct NES *nes, byte_t **arg)
 void cpu_acc(struct NES *nes, byte_t **arg)
 {
     *arg = &nes->cpu.A;
-    nes->cpu.pc;
 }
 
 void cpu_ixx(struct NES *nes, byte_t **arg)
@@ -724,7 +704,8 @@ void cpu_zpixy(struct NES *nes, byte_t **arg)
 void cpu_idr(struct NES *nes, byte_t **arg)
 {
     *arg =  cpumem_readbp(nes,
-            cpumem_reads(nes, nes->cpu.pc));
+			cpumem_reads(nes,
+            cpumem_reads(nes, nes->cpu.pc)));
     nes->cpu.sp += 2;
 }
 
