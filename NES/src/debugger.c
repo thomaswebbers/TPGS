@@ -1,10 +1,126 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "nes.h"
 
+char op_mode[256][7] =
+{
+	"IMP", "PREII", "IMP", "PREII", "ZP", "ZP", "ZP", "ZP", "IMP", "IMM", "ACC", "IMM", "ABS", "ABS", "ABS", "ABS",
+	"REL", "POSII", "IMP", "POSII", "ZPIXX", "ZPIXX", "ZPIXX", "ZPIXX", "IMP", "IXY", "IMP", "IXY", "IXX", "IXX", "IXX", "IXX",
+	"ABS", "PREII", "IMP", "PREII", "ZP", "ZP", "ZP", "ZP", "IMP", "IMM", "ACC", "IMM", "ABS", "ABS", "ABS", "ABS",
+	"REL", "POSII", "IMP", "POSII", "ZPIXX", "ZPIXX", "ZPIXX", "ZPIXX", "IMP", "IXY", "IMP", "IXY", "IXX", "IXX", "IXX", "IXX",
+	"IMP", "PREII", "IMP", "PREII", "ZP", "ZP", "ZP", "ZP", "IMP", "IMM", "ACC", "IMM", "ABS", "ABS", "ABS", "ABS",
+	"REL", "POSII", "IMP", "POSII", "ZPIXX", "ZPIXX", "ZPIXX", "ZPIXX", "IMP", "IXY", "IMP", "IXY", "IXX", "IXX", "IXX", "IXX",
+	"IMP", "PREII", "IMP", "PREII", "ZP", "ZP", "ZP", "ZP", "IMP", "IMM", "ACC", "IMM", "IDR", "ABS", "ABS", "ABS",
+	"REL", "POSII", "IMP", "POSII", "ZPIXX", "ZPIXX", "ZPIXX", "ZPIXX", "IMP", "IXY", "IMP", "IXY", "IXX", "IXX", "IXX", "IXX",
+	"IMM", "PREII", "IMM", "PREII", "ZP", "ZP", "ZP", "ZP", "IMP", "IMM", "IMP", "IMM", "ABS", "ABS", "ABS", "ABS",
+	"REL", "POSII", "IMP", "POSII", "ZPIXX", "ZPIXX", "ZPIXY", "ZPIXY", "IMP", "IXY", "IMP", "IXY", "IXX", "IXX", "IXY", "IXY",
+	"IMM", "PREII", "IMM", "PREII", "ZP", "ZP", "ZP", "ZP", "IMP", "IMM", "IMP", "IMM", "ABS", "ABS", "ABS", "ABS",
+	"REL", "POSII", "IMP", "POSII", "ZPIXX", "ZPIXX", "ZPIXY", "ZPIXY", "IMP", "IXY", "IMP", "IXY", "IXX", "IXX", "IXY", "IXY",
+	"IMM", "PREII", "IMM", "PREII", "ZP", "ZP", "ZP", "ZP", "IMP", "IMM", "IMP", "IMM", "ABS", "ABS", "ABS", "ABS",
+	"REL", "POSII", "IMP", "POSII", "ZPIXX", "ZPIXX", "ZPIXX", "ZPIXX", "IMP", "IXY", "IMP", "IXY", "IXX", "IXX", "IXX", "IXX",
+	"IMM", "PREII", "IMM", "PREII", "ZP", "ZP", "ZP", "ZP", "IMP", "IMM", "IMP", "IMM", "ABS", "ABS", "ABS", "ABS",
+	"REL", "POSII", "IMP", "POSII", "ZPIXX", "ZPIXX", "ZPIXX", "ZPIXX", "IMP", "IXY", "IMP", "IXY", "IXX", "IXX", "IXX", "IXX",
+};
+
+
 extern char op_names[256][4];
+
+static uint16_t nes_number(struct NES *nes, char *str)
+{
+    if(memcmp(str, "pc", 2) == 0)
+        return nes->cpu.pc;
+    else if(memcmp(str, "sp", 2) == 0)
+        return nes->cpu.sp + 0x100;
+    else
+        return strtol(str, NULL, 16);
+}
+
+static void print_cpumem(struct NES *nes, uint16_t address)
+{
+    printf(
+        "  CPU memory:\n"
+        "  address\tdata\toperation\n"
+    );
+
+    byte_t data;
+    for(int i = address - 3; i < 4 + address; i++)
+    {
+        data = *cpumem_readbp(nes, i);
+        printf(
+            "  [%x]   \t%x \t%s_%s   \n",
+            i, data, op_mode[data], op_names[data]
+        );
+    }
+}
+
+static void cpumem_scroll(struct NES *nes, uint16_t address)
+{
+	char str[20];
+	uint16_t num;
+	system("clear");
+	for(;;)
+	{
+		print_cpumem(nes, address);
+		printf("> ");
+		fgets(str, 20, stdin);
+		num = nes_number(nes, str + 2);
+		printf("\033[2K\033[10A\033[7D");
+		switch(str[0])
+		{
+			case 'u':
+				address -= num;
+				break;
+			case 'd':
+				address += num;
+				break;
+			case 'g':
+				address = num;
+				break;
+			case 'q':
+				printf("\033[10B");
+				return;
+		}
+	}
+}
+
+static void print_cpu(struct NES *nes)
+{
+
+}
+
+static void print_ppu(struct NES *nes)
+{
+
+}
+
+static void print_mmc(struct NES *nes)
+{
+
+}
+
+static void print_ppumem(struct NES *nes)
+{
+
+}
+
+static void ppumem_scroll(struct NES *nes)
+{
+
+}
+
+static void step(struct NES *nes)
+{
+
+}
+
+static void run(struct NES *nes)
+{
+
+}
 
 int init_nes(struct NES **nes, char *binary_file)
 {
@@ -18,65 +134,25 @@ int init_nes(struct NES **nes, char *binary_file)
 
 void run_nes(struct NES *nes)
 {
+	int size = 20;
+	char str[size];
     for(;;)
     {
         printf("> ");
-        int size = 20;
-        char *str = malloc(size * sizeof(char));
         fgets(str, size, stdin);
         uint16_t num;
+        FILE *fp;
 
         switch(str[0])
         {
-            //get opcode and pgr-rom data around te current opcode
-            case 'o':
-            {
-                byte_t opcode = *cpumem_readbp(nes, nes->cpu.pc);
-                printf(
-                    "  CPU memory:\n"
-                    "  address\tdata\n"
-                    "  [%x]\t%x\t\n"
-                    "  [%x]\t%x\t\n"
-                    "  [%x]\t%x\t\n"
-                    "->[%x]\t%x\t%c%c%c\n"
-                    "  [%x]\t%x\t\n"
-                    "  [%x]\t%x\t\n"
-                    "  [%x]\t%x\t\n",
-                    nes->cpu.pc - 3, *cpumem_readbp(nes, nes->cpu.pc - 3),
-                    nes->cpu.pc - 2, *cpumem_readbp(nes, nes->cpu.pc - 2),
-                    nes->cpu.pc - 1, *cpumem_readbp(nes, nes->cpu.pc - 1),
-                    nes->cpu.pc    , opcode,
-                    op_names[opcode][0],
-                    op_names[opcode][1],
-                    op_names[opcode][2],
-                    nes->cpu.pc + 1, *cpumem_readbp(nes, nes->cpu.pc + 1),
-                    nes->cpu.pc + 2, *cpumem_readbp(nes, nes->cpu.pc + 2),
-                    nes->cpu.pc + 3, *cpumem_readbp(nes, nes->cpu.pc + 3)
-                );
-                break;
-            }
-
             //cpu data
             case 'c':
-                printf(
-                    "  CPU state:\n"
-                    "  A      %x\n"
-                    "  X      %x\n"
-                    "  Y      %x\n"
-                    "  P      %x\n"
-                    "  sp     %x\n"
-                    "  pc     %x\n",
-                    nes->cpu.A,
-                    nes->cpu.X,
-                    nes->cpu.Y,
-                    psr_as_byte(nes),
-                    nes->cpu.sp,
-                    nes->cpu.pc
-                );
+				print_cpu(nes);
                 break;
 
             //ppu data
             case 'p':
+				print_ppu(nes);
                 break;
 
             //mmc and rom data
@@ -97,26 +173,10 @@ void run_nes(struct NES *nes)
                 break;
 
             //get byte and bytes adjacent to the address
-            case 'b':
-                num = strtol(str + 2, NULL, 16);
-                printf(
-                    "  CPU memory:\n"
-                    "  address\tdata\n"
-                    "  [%x]  \t%x\t\n"
-                    "  [%x]  \t%x\t\n"
-                    "  [%x]  \t%x\t\n"
-                    "->[%x]  \t%x\t\n"
-                    "  [%x]  \t%x\t\n"
-                    "  [%x]  \t%x\t\n"
-                    "  [%x]  \t%x\t\n",
-                    num - 3, *cpumem_readbp(nes, num - 3),
-                    num - 2, *cpumem_readbp(nes, num - 2),
-                    num - 1, *cpumem_readbp(nes, num - 1),
-                    num    , *cpumem_readbp(nes, num),
-                    num + 1, *cpumem_readbp(nes, num + 1),
-                    num + 2, *cpumem_readbp(nes, num + 2),
-                    num + 3, *cpumem_readbp(nes, num + 3)
-                );
+            case 'd':
+				num = nes_number(nes, str + 2);
+				cpumem_scroll(nes, num);
+				printf("test\n");
                 break;
 
             //step machine x times
@@ -128,9 +188,10 @@ void run_nes(struct NES *nes)
 
             //run vm
             case 'r':
-                while(step_nes(nes))
+                num = strtol(str + 2, NULL, 16);
+                while(step_nes(nes) && nes->cpu.pc != num)
                 {}
-                return;
+                break;
 
             //quit vm
             case 'q':
@@ -146,9 +207,9 @@ void run_nes(struct NES *nes)
                     "  c      show cpu registers\n"
                     "  p      show ppu registers\n"
                     "  m      show mmc and rom data\n"
-                    "  b      get byte at specified address (hexadecimal)\n"
-                    "  s      step x times (hexadecimal)\n"
-                    "  r      run nes\n"
+                    "  d      get data at specified address (hexadecimal)\n"
+                    "  s x    step x times (hexadecimal)\n"
+                    "  r x    run nes, breakpoint at x\n"
                     "  q      quit debugger\n"
                     "  h      help\n"
                 );
