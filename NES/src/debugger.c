@@ -47,12 +47,13 @@ static void print_cpumem(struct NES *nes, uint16_t address)
     );
 
     byte_t data;
-    for(int i = address - 3; i < 4 + address; i++)
+    address -= 3;
+    for(uint16_t i = 0; i < 7; i++)
     {
-        data = *cpumem_readbp(nes, i);
+        data = *cpumem_readbp(nes, address + i);
         printf(
             "  [%x]   \t%x \t%s_%s   \n",
-            i, data, op_mode[data], op_names[data]
+            (uint16_t)(address + i), data, op_mode[data], op_names[data]
         );
     }
 }
@@ -65,10 +66,10 @@ static void cpumem_scroll(struct NES *nes, uint16_t address)
 	for(;;)
 	{
 		print_cpumem(nes, address);
-		printf("> ");
+		printf("\033[2K> ");
 		fgets(str, 20, stdin);
-		num = nes_number(nes, str + 2);
-		printf("\033[2K\033[10A\033[7D");
+        num = nes_number(nes, str + 2);
+		printf("\r\033[10A");
 		switch(str[0])
 		{
 			case 'u':
@@ -83,13 +84,36 @@ static void cpumem_scroll(struct NES *nes, uint16_t address)
 			case 'q':
 				printf("\033[10B");
 				return;
+            case 'h':
+                printf(
+                    "\r\033[45C\033[1B  Help:"
+                    "\r\033[45C\033[1B  u x    go up by x times"
+                    "\r\033[45C\033[1B  d x    go down by x times"
+                    "\r\033[45C\033[1B  g x    go to x"
+                    "\r\033[45C\033[1B  q      quit address explorer"
+                    "\r\033[45C\033[1B  h      help"
+                    "\r\033[6A"
+                );
 		}
 	}
 }
 
 static void print_cpu(struct NES *nes)
 {
-
+    printf(
+        "  CPU:\n"
+        "  register     data\n"
+        "  A            %x\n"
+        "  X            %x\n"
+        "  Y            %x\n"
+        "  pc           %x\n"
+        "  sp           %x\n",
+        nes->cpu.A,
+        nes->cpu.X,
+        nes->cpu.Y,
+        nes->cpu.pc,
+        nes->cpu.sp
+    );
 }
 
 static void print_ppu(struct NES *nes)
@@ -99,7 +123,19 @@ static void print_ppu(struct NES *nes)
 
 static void print_mmc(struct NES *nes)
 {
-
+    printf(
+        "  ROM data:\n"
+        "  prg banks        %x\n"
+        "  chr banks        %x\n"
+        "  mapper           %x\n"
+        "  mirroring        %x\n"
+        "  battery backed   %x\n",
+        nes->mmc.rom.num_prg,
+        nes->mmc.rom.num_chr,
+        nes->mmc.rom.mapper,
+        nes->mmc.rom.mirror,
+        nes->mmc.rom.battery
+    );
 }
 
 static void print_ppumem(struct NES *nes)
@@ -157,26 +193,13 @@ void run_nes(struct NES *nes)
 
             //mmc and rom data
             case 'm':
-                printf(
-                    "  ROM data:\n"
-                    "  prg banks        %x\n"
-                    "  chr banks        %x\n"
-                    "  mapper           %x\n"
-                    "  mirroring        %x\n"
-                    "  battery backed   %x\n",
-                    nes->mmc.rom.num_prg,
-                    nes->mmc.rom.num_chr,
-                    nes->mmc.rom.mapper,
-                    nes->mmc.rom.mirror,
-                    nes->mmc.rom.battery
-                );
+                print_mmc(nes);
                 break;
 
             //get byte and bytes adjacent to the address
             case 'd':
 				num = nes_number(nes, str + 2);
 				cpumem_scroll(nes, num);
-				printf("test\n");
                 break;
 
             //step machine x times
@@ -195,7 +218,7 @@ void run_nes(struct NES *nes)
 
             //quit vm
             case 'q':
-                printf("Are you sure you want to quit? Y/n\n> ");
+                printf("Are you sure you want to quit? [Y/n]\n> ");
                 fgets(str, size, stdin);
                 if(str[0] == 'Y' || str[0] == 'y')
                     return;
@@ -204,11 +227,12 @@ void run_nes(struct NES *nes)
             //help
             case 'h':
                 printf(
+                    "  Help:\n"
                     "  c      show cpu registers\n"
                     "  p      show ppu registers\n"
                     "  m      show mmc and rom data\n"
-                    "  d      get data at specified address (hexadecimal)\n"
-                    "  s x    step x times (hexadecimal)\n"
+                    "  d x    get data at x\n"
+                    "  s x    step x times\n"
                     "  r x    run nes, breakpoint at x\n"
                     "  q      quit debugger\n"
                     "  h      help\n"
