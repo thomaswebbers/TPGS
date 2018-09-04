@@ -1001,9 +1001,9 @@ void cpu_ldy(struct NES *nes, byte_t arg)
 void cpu_lsr(struct NES *nes, byte_t *arg)
 {
     nes->cpu.P.C = ((*arg & 0x01) == 0x01);
-    *arg >= 1;
+    *arg >>= 1;
     nes->cpu.P.S = false;
-    nes->cpu.P.Z = (arg == 0);
+    nes->cpu.P.Z = (*arg == 0);
 }
 
 void cpu_ora(struct NES *nes, byte_t arg)

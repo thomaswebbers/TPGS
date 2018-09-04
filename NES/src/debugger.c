@@ -62,7 +62,6 @@ static void cpumem_scroll(struct NES *nes, uint16_t address)
 {
 	char str[20];
 	uint16_t num;
-	system("clear");
 	for(;;)
 	{
 		print_cpumem(nes, address);
@@ -106,11 +105,13 @@ static void print_cpu(struct NES *nes)
         "  A            %x\n"
         "  X            %x\n"
         "  Y            %x\n"
+        "  P            %x\n"
         "  pc           %x\n"
         "  sp           %x\n",
         nes->cpu.A,
         nes->cpu.X,
         nes->cpu.Y,
+        psr_as_byte(nes),
         nes->cpu.pc,
         nes->cpu.sp
     );
