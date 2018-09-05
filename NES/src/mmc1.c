@@ -1,3 +1,6 @@
+#include <stdint.h>
+#include <stdlib.h>
+
 #include "nes.h"
 #include "mmc1.h"
 
@@ -6,6 +9,7 @@ void init_mmc1(struct NES *nes)
     nes->cpu.memory.prg_low = nes->mmc.rom.prg;
     nes->cpu.memory.prg_high = nes->mmc.rom.prg
         + (nes->mmc.rom.num_prg - 1) * PRG_ROM_BANK_SIZE;
+    nes->cpu.memory.sram = malloc(sizeof(byte_t) * 0x2000);
 }
 
 void step_mmc1(struct NES *nes)
@@ -21,4 +25,9 @@ void step_mmc1(struct NES *nes)
             nes->mmc.shift_register = 0x80;
         }
     }
+}
+
+void destroy_mmc1(struct NES *nes)
+{
+    free(nes->cpu.memory.sram);
 }

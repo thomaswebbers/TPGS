@@ -8,4 +8,6 @@ void init_mmc1(struct NES *nes);
 
 void step_mmc1(struct NES *nes);
 
+void destroy_mmc1(struct NES *nes);
+
 #endif

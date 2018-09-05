@@ -45,5 +45,7 @@ void step_mmc(struct NES *nes)
 
 void destroy_mmc(struct NES *nes)
 {
+    if(nes->mmc.rom.mapper == MMC1)
+        destroy_mmc1(nes);
     destroy_rom(nes);
 }
